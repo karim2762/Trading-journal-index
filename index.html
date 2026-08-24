@@ -24,6 +24,9 @@
   --red:#e5484d;
   --red-dim:rgba(229,72,77,.12);
   --blue-dim:rgba(47,107,255,.12);
+  --purple-dim:rgba(139,92,246,.12);
+  --orange-dim:rgba(247,144,9,.14);
+  --green-dim:rgba(18,183,106,.12);
   --text:#101423;
   --text-dim:#767e93;
   --text-dim2:#a4abbd;
@@ -76,14 +79,28 @@ input,select,textarea{font-family:inherit;}
 @keyframes shimmer{100%{transform:translateX(100%);}}
 
 /* ---------- App shell ---------- */
-#app{max-width:560px;margin:0 auto;position:relative;min-height:100vh;}
+:root{--app-max:560px;}
+#app{max-width:var(--app-max);margin:0 auto;position:relative;min-height:100vh;width:100%;}
+@media(min-width:600px) and (max-width:859px){
+  :root{--app-max:600px;}
+}
 @media(min-width:860px){
-  body{padding-top:28px;padding-bottom:calc(48px + env(safe-area-inset-bottom));}
-  #app{max-width:920px;min-height:auto;background:var(--card);border:1px solid var(--card-border);
+  body{padding-top:clamp(20px,3vw,40px);padding-bottom:calc(48px + env(safe-area-inset-bottom));}
+  :root{--app-max:860px;}
+  #app{min-height:auto;background:var(--card);border:1px solid var(--card-border);
     border-radius:28px;box-shadow:0 30px 70px -30px rgba(20,30,60,.35),0 2px 10px -2px rgba(20,30,60,.08);
     overflow:hidden;animation:appIn .5s cubic-bezier(.2,.8,.2,1);}
   .widget-grid{grid-template-columns:repeat(3,1fr) !important;}
   .navbar-inner{max-width:640px;}
+}
+@media(min-width:1120px){
+  :root{--app-max:1040px;}
+  .widget-grid{grid-template-columns:repeat(4,1fr) !important;}
+  .navbar-inner{max-width:760px;}
+}
+@media(min-width:1500px){
+  :root{--app-max:1180px;}
+  .navbar-inner{max-width:840px;}
 }
 @keyframes appIn{from{opacity:0;transform:translateY(14px) scale(.99);}to{opacity:1;transform:none;}}
 
@@ -248,11 +265,11 @@ textarea.input{resize:vertical;min-height:70px;}
 .sticky-actions{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + var(--kb-offset));
   z-index:45;display:flex;justify-content:center;padding:0;pointer-events:none;
   box-shadow:0 -8px 24px -12px rgba(20,30,60,.12);}
-.sticky-actions-inner{pointer-events:all;width:100%;max-width:560px;display:flex;gap:10px;
+.sticky-actions-inner{pointer-events:all;width:100%;max-width:var(--app-max);display:flex;gap:10px;
   padding:12px 18px calc(12px + env(safe-area-inset-bottom));
   background:rgba(238,241,248,.92);backdrop-filter:blur(14px);border-top:1px solid var(--card-border);}
 @media(min-width:860px){
-  .sticky-actions-inner{max-width:920px;border-radius:0 0 28px 28px;}
+  .sticky-actions-inner{border-radius:0 0 28px 28px;}
 }
 .navbar.hidden{display:none;}
 .page-title{font-family:'Space Grotesk';font-size:22px;font-weight:700;margin:6px 0 4px;}
@@ -260,7 +277,8 @@ textarea.input{resize:vertical;min-height:70px;}
 
 /* ---------- Cards / lists ---------- */
 .card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);
-  position:relative;overflow:hidden;animation:widgetIn .4s cubic-bezier(.2,.8,.2,1) backwards;}
+  position:relative;overflow:hidden;}
+.page:not(.no-card-anim) .card{animation:widgetIn .4s cubic-bezier(.2,.8,.2,1) backwards;}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue-grad);opacity:.85;}
 .card:nth-of-type(2)::before{background:var(--purple-grad);}
 .card:nth-of-type(3)::before{background:var(--green-grad);}
@@ -270,21 +288,32 @@ textarea.input{resize:vertical;min-height:70px;}
 .card:nth-of-type(3){animation-delay:.14s;}
 .card:nth-of-type(4){animation-delay:.20s;}
 .trade-card{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--card-border);
-  border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);}
-.trade-card:active{transform:scale(.98);}
+  border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);
+  animation:widgetIn .4s cubic-bezier(.2,.8,.2,1) backwards;transition:transform .15s,box-shadow .15s,border-color .15s;
+  content-visibility:auto;contain-intrinsic-size:auto 78px;}
+.trade-card:active{transform:scale(.97);}
+@media(hover:hover){.trade-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px -10px rgba(20,30,60,.22);border-color:var(--blue-dim);}}
+@media(prefers-reduced-motion:reduce){.trade-card{animation:none;}}
 .trade-banner{width:52px;height:52px;border-radius:12px;object-fit:cover;background:var(--card-hi);flex-shrink:0;}
 .trade-banner.ph{display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:var(--text-dim);font-size:11px;}
 .trade-info{flex:1;min-width:0;}
-.trade-symbol-row{display:flex;align-items:center;gap:7px;}
+.trade-symbol-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .trade-symbol{font-weight:700;font-size:14.5px;}
 .dir-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px;}
 .dir-badge.long{background:var(--blue-dim);color:var(--blue2);}
 .dir-badge.short{background:var(--red-dim);color:var(--red);}
+.status-tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px 2px 5px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px;}
+.status-tag svg{width:11px;height:11px;}
+.status-tag.be{background:var(--purple-dim);color:var(--purple);}
+.status-tag.openstat{background:var(--orange-dim);color:var(--orange);animation:tagPulse 2s ease-in-out infinite;}
+@keyframes tagPulse{0%,100%{opacity:1;}50%{opacity:.55;}}
 .trade-meta{font-size:11.5px;color:var(--text-dim);margin-top:3px;}
 .trade-pnl{text-align:right;flex-shrink:0;}
 .trade-pnl .amt{font-family:'Space Grotesk';font-weight:700;font-size:15px;}
 .trade-pnl .amt.pos{color:var(--blue2);}
 .trade-pnl .amt.neg{color:var(--red);}
+.trade-pnl .amt.be{color:var(--purple);}
+.trade-pnl .amt.openstat{color:var(--orange);}
 .trade-pnl .date{font-size:10.5px;color:var(--text-dim2);margin-top:2px;}
 
 /* ---------- Forms ---------- */
@@ -296,8 +325,16 @@ textarea.input{resize:vertical;min-height:70px;}
    them (2px), which made the fields look crammed together / overlapping —
    give those a proper gap instead. */
 .field-label + .form-row{margin-top:6px;}
-.form-row + .form-row{margin-top:16px;}
+.form-row + .form-row{margin-top:18px;}
+/* Each column in a form-row is its own flex column so that a taller left
+   cell (e.g. a label that wraps, or a checkbox row) never pushes only the
+   left input down while the right input in the same row stays put — every
+   input in a row now sits on the same baseline regardless of what grows
+   above/below it in its own column. */
+.form-row > div{display:flex;flex-direction:column;min-width:0;}
+.form-row .field-label{flex:0 0 auto;}
 .toggle-group{display:flex;gap:8px;}
+.toggle-opt{transition:background .18s,color .18s,border-color .18s,box-shadow .18s,transform .12s;}
 .toggle-opt{flex:1;text-align:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);
   background:var(--card-hi);font-weight:700;font-size:13.5px;cursor:pointer;color:var(--text-dim);transition:.15s;}
 .toggle-opt:active{transform:scale(.96);}
@@ -305,10 +342,64 @@ textarea.input{resize:vertical;min-height:70px;}
 .on-short.active{box-shadow:0 4px 14px -6px rgba(229,72,77,.5);}
 .toggle-opt.on-long.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue2);}
 .toggle-opt.on-short.active{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.toggle-opt.on-be.active{background:var(--purple-dim);border-color:var(--purple);color:var(--purple);box-shadow:0 4px 14px -6px rgba(139,92,246,.5);}
+.toggle-opt.on-open.active{background:var(--orange-dim);border-color:var(--orange);color:var(--orange);box-shadow:0 4px 14px -6px rgba(247,144,9,.5);}
+.toggle-opt .ticon{display:inline-flex;vertical-align:-3px;margin-right:3px;}
+.toggle-opt .ticon svg{width:13px;height:13px;}
 .toggle-opt.sm{padding:9px;font-size:12px;}
-.na-row{display:flex;align-items:flex-start;gap:7px;margin-top:9px;margin-bottom:4px;font-size:11.5px;line-height:1.4;color:var(--text-dim);flex-wrap:wrap;}
+.na-row{display:flex;align-items:flex-start;gap:7px;margin-top:9px;margin-bottom:2px;font-size:11.5px;line-height:1.4;color:var(--text-dim);flex-wrap:wrap;}
 .na-row input{accent-color:var(--blue);flex-shrink:0;margin-top:2px;}
 .na-row label{cursor:pointer;}
+/* A field-label with an optional trailing hint (e.g. "— saved as a win")
+   used to grow the label to two lines on narrow screens and push only
+   that one input down, throwing it out of line with its neighbour in the
+   same form-row. The hint now renders as its own small caption UNDER the
+   input instead of inline in the label, so every field-label in a row
+   stays exactly one line and every input lines up. */
+.field-hint{display:block;font-size:11px;font-weight:600;margin-top:6px;color:var(--text-dim2);transition:color .15s;}
+.field-hint.is-win{color:var(--green);}
+.field-hint.is-loss{color:var(--red);}
+.field-label-row{display:flex;align-items:center;gap:6px;}
+.field-label-row .fli{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;flex-shrink:0;color:#fff;}
+.field-label-row .fli svg{width:11px;height:11px;}
+.fli-entry{background:var(--blue-grad);}
+.fli-sl{background:var(--red);background:linear-gradient(135deg,#e5484d,#ff8a8f);}
+.fli-tp{background:var(--green-grad);}
+.fli-rr{background:var(--purple-grad);}
+.fli-date{background:var(--orange-grad);}
+.fli-time{background:var(--cyan-grad);}
+.fli-symbol{background:var(--blue-grad);}
+.fli-lots{background:linear-gradient(135deg,#6366f1,#a5b4fc);}
+.fli-exit{background:var(--pink-grad);}
+.fli-pnl{background:var(--green-grad);}
+.fli-pnl.neg{background:linear-gradient(135deg,#e5484d,#ff8a8f);}
+.fli-tags{background:var(--purple-grad);}
+.fli-notes{background:linear-gradient(135deg,#64748b,#94a3b8);}
+.field-label-row .auto-badge{margin-left:auto;font-size:9.5px;font-weight:700;text-transform:none;letter-spacing:0;
+  color:var(--blue2);background:var(--blue-dim);border:1px solid rgba(47,107,255,.35);padding:2px 7px;border-radius:8px;
+  animation:autoBadgeIn .25s ease,autoBadgePulse 2.2s ease-in-out .25s infinite;}
+@keyframes autoBadgeIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:none;}}
+@keyframes autoBadgePulse{0%,100%{box-shadow:0 0 0 0 rgba(47,107,255,.35);}50%{box-shadow:0 0 0 4px rgba(47,107,255,0);}}
+@media(prefers-reduced-motion:reduce){.field-label-row .auto-badge{animation:none;}}
+/* The active Long/Short and Win/Loss toggle pills use an outer glow to
+   signal selection. On a toggle-group that sits directly above another
+   row (e.g. Direction sits right above Date/Time), that glow could bleed
+   down far enough to visually touch the icons in the row below. Give the
+   group breathing room and rein in how far the glow spreads. */
+.toggle-group{margin-bottom:4px;}
+.on-long.active{box-shadow:0 3px 10px -6px rgba(18,183,106,.5);}
+.on-short.active{box-shadow:0 3px 10px -6px rgba(229,72,77,.5);}
+/* Colour-coded focus glow so each field feels distinct instead of every
+   input flashing the same generic blue ring. */
+#f-entry:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-dim);}
+#f-sl:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-dim);}
+#f-tp:focus{border-color:#12b76a;box-shadow:0 0 0 4px rgba(18,183,106,.14);}
+#f-rr:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.14);}
+.date-quick{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.date-chip{padding:6px 12px;border-radius:20px;font-size:11.5px;font-weight:700;border:1px solid var(--border);
+  background:var(--card-hi);color:var(--text-dim);cursor:pointer;transition:.15s;}
+.date-chip:active{transform:scale(.94);}
+.date-chip.active{background:var(--orange-grad);border-color:transparent;color:#fff;box-shadow:0 4px 12px -5px rgba(247,144,9,.6);}
 .chip-input{display:flex;flex-wrap:wrap;gap:6px;background:var(--card-hi);border:1px solid var(--border);border-radius:12px;padding:8px;}
 .chip{background:var(--blue-dim);color:var(--blue2);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:8px;
   display:flex;align-items:center;gap:6px;}
@@ -359,8 +450,16 @@ textarea.input{resize:vertical;min-height:70px;}
 .filter-chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:4px;}
 .filter-chips::-webkit-scrollbar{display:none;}
 .fchip{flex-shrink:0;padding:7px 13px;border-radius:20px;background:var(--card-hi);border:1px solid var(--border);
-  font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;white-space:nowrap;}
+  font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;transition:background .18s,color .18s,border-color .18s,transform .12s;}
+.fchip:active{transform:scale(.94);}
+.fchip .fcicon{display:inline-flex;margin-right:4px;}
+.fchip .fcicon svg{width:13px;height:13px;}
 .fchip.active{background:var(--blue-dim);color:var(--blue2);border-color:var(--blue);}
+.fchip.fc-win.active{background:var(--blue-dim);color:var(--blue2);border-color:var(--blue);}
+.fchip.fc-loss.active{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+.fchip.fc-be.active{background:var(--purple-dim);color:var(--purple);border-color:var(--purple);}
+.fchip.fc-open.active{background:var(--orange-dim);color:var(--orange);border-color:var(--orange);}
 .cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim2);margin:18px 0 8px 2px;}
 .catalog-item{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--card-border);
   border-radius:14px;margin-bottom:9px;background:var(--card);}
@@ -372,7 +471,12 @@ textarea.input{resize:vertical;min-height:70px;}
 .catalog-add.added{background:var(--card-hi);color:var(--text-dim);}
 
 /* ---------- Trade detail ---------- */
-.detail-banner{width:100%;height:150px;border-radius:16px;object-fit:cover;margin-bottom:14px;background:var(--card-hi);}
+/* Was object-fit:cover inside a fixed 150px box, which crops tall/portrait
+   banner screenshots. Wrap it in a letterboxed frame instead so the whole
+   image is always visible, just placed inside a small frame. */
+.detail-banner-wrap{width:100%;max-height:220px;border-radius:16px;margin-bottom:14px;
+  background:var(--card-hi);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.detail-banner{width:100%;height:100%;max-height:220px;object-fit:contain;display:block;}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
 .detail-cell{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:12px;}
 .detail-cell .k{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;font-weight:700;letter-spacing:.4px;}
@@ -413,6 +517,80 @@ textarea.input{resize:vertical;min-height:70px;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 @media(min-width:600px){.widget-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ============================================================
+   DESKTOP DASHBOARD SHELL — sidebar layout, colourful nav icons
+   ============================================================ */
+.app-layout{display:block;}
+.sidebar{display:none;}
+.main-col{display:block;}
+
+.side-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:#fff;box-shadow:0 6px 14px -6px rgba(20,30,60,.35);}
+.side-icon svg{width:18px;height:18px;}
+.side-icon.grad-blue{background:var(--blue-grad);}
+.side-icon.grad-purple{background:var(--purple-grad);}
+.side-icon.grad-green{background:var(--green-grad);}
+.side-icon.grad-orange{background:var(--orange-grad);}
+.side-icon.grad-pink{background:var(--pink-grad);}
+.side-icon.grad-cyan{background:var(--cyan-grad);}
+
+@media(min-width:1180px){
+  :root{--app-max:1180px;}
+  body{padding-top:28px;padding-bottom:28px;}
+  #app{max-width:1180px;background:transparent;border:none;box-shadow:none;border-radius:0;overflow:visible;animation:none;}
+  .app-layout{display:flex;align-items:flex-start;gap:22px;}
+
+  .sidebar{display:flex;flex-direction:column;width:252px;flex-shrink:0;position:sticky;top:28px;
+    height:calc(100vh - 56px);background:var(--card);border:1px solid var(--card-border);border-radius:24px;
+    padding:20px 16px;box-shadow:0 30px 70px -35px rgba(20,30,60,.35),0 2px 10px -2px rgba(20,30,60,.08);
+    overflow-y:auto;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;padding:2px 6px 18px;}
+  .sidebar-brand img{width:32px;height:32px;border-radius:9px;}
+  .sidebar-brand .sb-name{font-family:'Space Grotesk';font-weight:700;font-size:16px;}
+  .sidebar-brand .sb-sub{font-size:10px;color:var(--text-dim2);font-weight:600;letter-spacing:.02em;}
+
+  .side-section-label{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--text-dim2);padding:14px 10px 6px;}
+  .side-nav-item{display:flex !important;flex-direction:row !important;align-items:center;gap:11px;
+    width:100%;padding:8px 10px;border-radius:14px;font-size:13.5px;font-weight:600;color:var(--text-dim);
+    background:transparent;border:1px solid transparent;cursor:pointer;transition:.15s;text-align:left;}
+  .side-nav-item span.side-label{flex:1;}
+  .side-nav-item:hover{background:var(--card-hi);}
+  .side-nav-item.active{background:var(--blue-dim);border-color:rgba(47,107,255,.25);color:var(--blue2);}
+  .side-nav-item.active .side-icon{box-shadow:0 8px 18px -6px rgba(47,107,255,.55);}
+  .side-badge-soon{margin-left:auto;font-size:9px;font-weight:800;letter-spacing:.03em;color:var(--purple);
+    background:var(--purple-dim);border-radius:99px;padding:2px 7px;flex-shrink:0;}
+  .side-nav-item.side-soon{color:var(--text-dim2);}
+
+  .sidebar-cta{margin:14px 2px 6px;display:flex !important;flex-direction:row !important;align-items:center;
+    justify-content:center;gap:8px;padding:11px 14px;border-radius:14px;border:none;cursor:pointer;
+    background:var(--blue-grad);color:#fff;font-weight:700;font-size:13px;box-shadow:0 10px 22px -8px rgba(47,107,255,.6);}
+  .sidebar-cta:active{transform:scale(.97);}
+  .sidebar-cta svg{width:16px;height:16px;}
+
+  .sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);display:flex;
+    align-items:center;gap:10px;}
+  .sidebar-footer .avatar{width:32px;height:32px;font-size:13px;}
+  .sidebar-footer .sf-name{font-size:12.5px;font-weight:700;}
+  .sidebar-footer .sf-tag{font-size:10px;color:var(--text-dim2);font-weight:600;}
+
+  .navbar{display:none;}
+  .main-col{flex:1;min-width:0;background:var(--card);border:1px solid var(--card-border);border-radius:24px;
+    overflow:hidden;box-shadow:0 30px 70px -35px rgba(20,30,60,.35),0 2px 10px -2px rgba(20,30,60,.08);}
+  .topbar{padding:20px 28px;border-bottom:1px solid var(--border);}
+  .topbar-name{font-size:18px;}
+  #route-outlet{padding:4px 6px;}
+  .page{padding-left:10px;padding-right:10px;}
+  .widget-grid{padding:0 10px 26px;gap:16px;}
+  .widget{transition:transform .18s ease, box-shadow .18s ease;}
+  .widget:hover{transform:translateY(-3px);box-shadow:0 22px 40px -20px rgba(20,30,60,.28);}
+}
+@media(min-width:1440px){
+  :root{--app-max:1320px;}
+  #app{max-width:1320px;}
+  .widget-grid{grid-template-columns:repeat(4,1fr) !important;}
+}
 </style>
 </head>
 <body>
@@ -580,6 +758,22 @@ function svgIcon(name){
     uploadfile:'<path d="M12 21V8"/><path d="M7 13l5-5 5 5"/><path d="M5 21h14"/>',
     wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M15 9h.01M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',
     back:'<path d="M15 18l-6-6 6-6"/>',
+    calendar:'<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".5" fill="currentColor"/>',
+    shield:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/>',
+    ratio:'<path d="M4 20 20 4"/><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/>',
+    dollar:'<path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5S9.2 10 12 10s5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5"/>',
+    layers:'<path d="M12 2 2 8l10 6 10-6z"/><path d="M2 14l10 6 10-6"/>',
+    exitdoor:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+    flag:'<path d="M4 22V4"/><path d="M4 4h14l-3 5 3 5H4"/>',
+    tag:'<path d="M20.6 12.6 12.6 4.6a2 2 0 0 0-1.4-.6H5a2 2 0 0 0-2 2v6.2c0 .5.2 1 .6 1.4l8 8a2 2 0 0 0 2.8 0l6.2-6.2a2 2 0 0 0 0-2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',
+    equal:'<path d="M5 9h14M5 15h14"/>',
+    hourglass:'<path d="M6 2h12M6 22h12M6 2c0 6 12 6 12 0M6 22c0-6 12-6 12 0"/>',
+    trophy:'<path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/>',
+    sparkle:'<path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>',
   };
   return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name]||''}</svg>`;
 }
@@ -588,7 +782,25 @@ function svgIcon(name){
 function closedTrades(){ return S.trades.filter(t=>t.status!=='open').sort((a,b)=>new Date(a.date)-new Date(b.date)); }
 function allSorted(){ return [...S.trades].sort((a,b)=>new Date(b.date)-new Date(a.date) || (b.id-a.id)); }
 
+// computeStats() does a full pass over every trade (sorts, filters, reduces,
+// builds the equity curve, month/weekday/session breakdowns...) and used to
+// re-run from scratch every single time it was called — 2-3x per page for
+// Dashboard/Analysis, since the render function and the chart-mount function
+// each call it independently. None of that work changes between those calls
+// (same trade list, same starting balance), so it's cached here and only
+// recomputed when the trades array or starting balance actually changes.
+// This is a pure performance win — it doesn't touch what gets rendered or
+// any animation/effect, just how many times the same numbers get crunched.
+let _statsCache = null, _statsCacheTrades = null, _statsCacheBal = null;
 function computeStats(){
+  const bal = (S.profile && S.profile.startingBalance) || 0;
+  if(_statsCache && _statsCacheTrades===S.trades && _statsCacheBal===bal) return _statsCache;
+  _statsCache = computeStatsRaw();
+  _statsCacheTrades = S.trades;
+  _statsCacheBal = bal;
+  return _statsCache;
+}
+function computeStatsRaw(){
   const trades = closedTrades();
   const wins = trades.filter(t=>t.pnl>0);
   const losses = trades.filter(t=>t.pnl<0);
@@ -1268,18 +1480,70 @@ function bindOnboarding(){
 
 /* ---------------- Shell (header + nav) ---------------- */
 function renderShell(){
+  const initial = (S.profile.name||'?').trim().charAt(0).toUpperCase();
   return `
-    <div class="topbar">
-      <div class="topbar-left">
-        <div class="topbar-logo-wrap"><img src="${LOGO_SRC}" class="topbar-logo" alt=""></div>
-        <div class="topbar-name">Trading Journal</div>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="${LOGO_SRC}" alt="">
+        <div>
+          <div class="sb-name">Trading Journal</div>
+          <div class="sb-sub">Local-first · Private</div>
+        </div>
       </div>
-      <div class="topbar-right">
-        <div class="icon-btn" id="btn-storage" title="Storage">${svgIcon('bell')}</div>
-        <div class="avatar" id="btn-avatar">${(S.profile.name||'?').trim().charAt(0).toUpperCase()}</div>
+
+      <div class="side-section-label">Workspace</div>
+      <button class="nav-item side-nav-item" data-route="dashboard">
+        <span class="side-icon grad-blue">${svgIcon('dashboard')}</span><span class="side-label">Dashboard</span>
+      </button>
+      <button class="nav-item side-nav-item" data-route="history">
+        <span class="side-icon grad-purple">${svgIcon('journal')}</span><span class="side-label">Journal</span>
+      </button>
+      <button class="nav-item side-nav-item" data-route="analysis">
+        <span class="side-icon grad-green">${svgIcon('chart')}</span><span class="side-label">Analysis</span>
+      </button>
+      <button class="nav-item side-nav-item" data-route="settings">
+        <span class="side-icon grad-orange">${svgIcon('settings')}</span><span class="side-label">Settings</span>
+      </button>
+
+      <div class="side-section-label">Intelligence</div>
+      <button class="side-nav-item side-soon" data-soon="Insights AI">
+        <span class="side-icon grad-pink">${svgIcon('sparkle')}</span><span class="side-label">Insights AI</span><span class="side-badge-soon">SOON</span>
+      </button>
+
+      <div class="side-section-label">Markets</div>
+      <button class="side-nav-item side-soon" data-soon="Economic Calendar">
+        <span class="side-icon grad-cyan">${svgIcon('calendar')}</span><span class="side-label">Econ Calendar</span><span class="side-badge-soon">SOON</span>
+      </button>
+      <button class="side-nav-item side-soon" data-soon="Leaderboards">
+        <span class="side-icon grad-orange">${svgIcon('trophy')}</span><span class="side-label">Leaderboards</span><span class="side-badge-soon">SOON</span>
+      </button>
+
+      <button class="sidebar-cta" id="btn-fab-desktop">${svgIcon('plus')}New Trade</button>
+
+      <div class="sidebar-footer">
+        <div class="avatar">${initial}</div>
+        <div>
+          <div class="sf-name">${(S.profile.name||'Trader')}</div>
+          <div class="sf-tag">Stored on this device</div>
+        </div>
       </div>
+    </aside>
+
+    <div class="main-col">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-logo-wrap"><img src="${LOGO_SRC}" class="topbar-logo" alt=""></div>
+          <div class="topbar-name">Trading Journal</div>
+        </div>
+        <div class="topbar-right">
+          <div class="icon-btn" id="btn-storage" title="Storage">${svgIcon('bell')}</div>
+          <div class="avatar" id="btn-avatar">${initial}</div>
+        </div>
+      </div>
+      <div id="route-outlet"></div>
     </div>
-    <div id="route-outlet"></div>
+  </div>
     <div class="navbar"><div class="navbar-inner">
       <button class="nav-item" data-route="dashboard">${svgIcon('dashboard')}<span>Dashboard</span></button>
       <button class="nav-item" data-route="history">${svgIcon('journal')}<span>Journal</span></button>
@@ -1293,8 +1557,11 @@ function renderShell(){
 function bindShell(){
   $$('.nav-item').forEach(b=>b.addEventListener('click', ()=>{ S.route = b.dataset.route; renderRoute(); }));
   $('#btn-fab').addEventListener('click', ()=>{ S.route='log'; renderRoute(); });
+  const fabDesktop = $('#btn-fab-desktop');
+  if(fabDesktop) fabDesktop.addEventListener('click', ()=>{ S.route='log'; renderRoute(); });
   $('#btn-avatar').addEventListener('click', ()=>{ S.route='settings'; renderRoute(); });
   $('#btn-storage').addEventListener('click', showStorageToast);
+  $$('.side-soon').forEach(b=>b.addEventListener('click', ()=>toast(`${b.dataset.soon} is coming soon`)));
 }
 async function showStorageToast(){
   if(navigator.storage && navigator.storage.estimate){
@@ -1457,6 +1724,8 @@ function openWidgetCatalog(){
 }
 
 /* ---------------- Log Trade ---------------- */
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function yesterdayISO(){ const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
 function freshDraft(){
   const now = new Date();
   return {
@@ -1466,8 +1735,8 @@ function freshDraft(){
     // Default status is 'win' (a closed/exited trade), so the exit price
     // must be enabled by default too — it was previously stuck disabled
     // with "trade still open" pre-checked, contradicting the default result.
-    slNA:false, tpNA:false, exitNA:false,
-    status:'win', pnl:'', rr:'', tags:[], notes:'',
+    slNA:false, tpNA:false, exitNA:false, exitManual:false,
+    status:'win', statusManual:false, pnl:'', pnlManual:false, rr:'', tags:[], notes:'',
     calcImage:null, bannerImage:null, durationMin:'',
   };
 }
@@ -1475,7 +1744,7 @@ function renderLogTrade(){
   if(!S.draftTrade) S.draftTrade = freshDraft();
   const d = S.draftTrade;
   return `
-  <div class="page">
+  <div class="page${d._formRendered?' no-card-anim':''}">
     <div class="page-title">Log Trade</div>
     <div class="page-sub">Upload your chart screenshots, fill in the details, and save — your journal remembers the rest for next time.</div>
 
@@ -1497,7 +1766,7 @@ function renderLogTrade(){
     </div>
 
     <div class="card">
-      <div class="field-label" style="margin-top:0;">Symbol</div>
+      <div class="field-label field-label-row" style="margin-top:0;"><span class="fli fli-symbol">${svgIcon('hash')}</span>Symbol</div>
       <input class="input" id="f-symbol" placeholder="e.g. EURUSD, BTCUSD, XAUUSD" value="${d.symbol}">
 
       <div class="field-label">Direction</div>
@@ -1507,52 +1776,81 @@ function renderLogTrade(){
       </div>
 
       <div class="form-row">
-        <div><div class="field-label">Date</div><input class="input" type="date" id="f-date" value="${d.date}"></div>
-        <div><div class="field-label">Time</div><input class="input" type="time" id="f-time" value="${d.time}"></div>
-      </div>
-
-      <div class="form-row">
-        <div><div class="field-label">Lots / Size</div><input class="input" type="number" step="any" id="f-lots" placeholder="0.10" value="${d.lots}"></div>
-        <div><div class="field-label">Entry Price</div><input class="input" type="number" step="any" id="f-entry" placeholder="0.00" value="${d.entry}"></div>
+        <div>
+          <div class="field-label field-label-row"><span class="fli fli-date">${svgIcon('calendar')}</span>Date</div>
+          <input class="input" type="date" id="f-date" value="${d.date}">
+          <div class="date-quick">
+            <div class="date-chip ${d.date===todayISO()?'active':''}" data-quickdate="today">Today</div>
+            <div class="date-chip ${d.date===yesterdayISO()?'active':''}" data-quickdate="yesterday">Yesterday</div>
+          </div>
+        </div>
+        <div>
+          <div class="field-label field-label-row"><span class="fli fli-time">${svgIcon('clock')}</span>Time</div>
+          <input class="input" type="time" id="f-time" value="${d.time}">
+          <div class="date-quick">
+            <div class="date-chip" data-quicktime="now">Now</div>
+          </div>
+        </div>
       </div>
 
       <div class="form-row">
         <div>
-          <div class="field-label">Stop Loss</div>
+          <div class="field-label field-label-row"><span class="fli fli-lots">${svgIcon('layers')}</span>Lots / Size</div>
+          <input class="input" type="number" step="any" id="f-lots" placeholder="0.10" value="${d.lots}">
+        </div>
+        <div><div class="field-label field-label-row"><span class="fli fli-entry">${svgIcon('wand')}</span>Entry Price</div><input class="input" type="number" step="any" id="f-entry" placeholder="0.00" value="${d.entry}"></div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <div class="field-label field-label-row"><span class="fli fli-sl">${svgIcon('shield')}</span>Stop Loss</div>
           <input class="input" type="number" step="any" id="f-sl" placeholder="0.00" value="${d.sl}" ${d.slNA?'disabled':''}>
           <div class="na-row"><input type="checkbox" id="f-slna" ${d.slNA?'checked':''}><label for="f-slna">N/A — no stop set</label></div>
         </div>
         <div>
-          <div class="field-label">Take Profit</div>
+          <div class="field-label field-label-row"><span class="fli fli-tp">${svgIcon('target')}</span>Take Profit</div>
           <input class="input" type="number" step="any" id="f-tp" placeholder="0.00" value="${d.tp}" ${d.tpNA?'disabled':''}>
           <div class="na-row"><input type="checkbox" id="f-tpna" ${d.tpNA?'checked':''}><label for="f-tpna">N/A — no target set</label></div>
         </div>
       </div>
 
-      <div class="field-label">Exit Price</div>
+      <div class="field-label field-label-row" id="f-exit-label"><span class="fli fli-exit">${svgIcon('exitdoor')}</span>Exit Price
+        ${(!d.exitManual && !d.exitNA && d.status!=='open' && d.exit!=='') ? `<span class="auto-badge" id="exit-auto-badge">auto</span>` : ''}
+      </div>
       <input class="input" type="number" step="any" id="f-exit" placeholder="0.00" value="${d.exit}" ${d.exitNA?'disabled':''}>
       <div class="na-row"><input type="checkbox" id="f-exitna" ${d.exitNA?'checked':''}><label for="f-exitna">N/A — trade still open</label></div>
 
-      <div class="field-label">Result</div>
+      <div class="field-label field-label-row"><span class="fli fli-tags" style="background:var(--orange-grad);">${svgIcon('flag')}</span>Result</div>
       <div class="toggle-group">
-        <div class="toggle-opt sm ${d.status==='win'?'on-long active':''}" data-status="win">Win</div>
-        <div class="toggle-opt sm ${d.status==='loss'?'on-short active':''}" data-status="loss">Loss</div>
-        <div class="toggle-opt sm ${d.status==='breakeven'?'active':''}" data-status="breakeven" style="${d.status==='breakeven'?'background:var(--card-hi);color:var(--text);':''}">B/E</div>
-        <div class="toggle-opt sm ${d.status==='open'?'active':''}" data-status="open" style="${d.status==='open'?'background:var(--card-hi);color:var(--text);':''}">Open</div>
+        <div class="toggle-opt sm on-long ${d.status==='win'?'active':''}" data-status="win"><span class="ticon">${svgIcon('trophy')}</span>Win</div>
+        <div class="toggle-opt sm on-short ${d.status==='loss'?'active':''}" data-status="loss"><span class="ticon">${svgIcon('close')}</span>Loss</div>
+        <div class="toggle-opt sm on-be ${d.status==='breakeven'?'active':''}" data-status="breakeven"><span class="ticon">${svgIcon('equal')}</span>B/E</div>
+        <div class="toggle-opt sm on-open ${d.status==='open'?'active':''}" data-status="open"><span class="ticon">${svgIcon('hourglass')}</span>Open</div>
       </div>
 
       <div class="form-row" style="margin-top:14px;">
-        <div><div class="field-label">P&L Amount ($) <span style="color:var(--text-dim2);font-weight:400;text-transform:none;">${d.status==='loss'?'— saved as a loss':d.status==='win'?'— saved as a win':''}</span></div><input class="input" type="number" step="any" id="f-pnl" placeholder="0.00" value="${d.pnl}" ${d.status==='open'?'disabled':''}></div>
-        <div><div class="field-label">Risk/Reward</div><input class="input" type="number" step="any" id="f-rr" placeholder="e.g. 2.5" value="${d.rr}"></div>
+        <div>
+          <div class="field-label field-label-row">
+            <span class="fli fli-pnl ${parseFloat(d.pnl)<0?'neg':''}">${svgIcon('dollar')}</span>P&L Amount ($)
+            ${(!d.pnlManual && d.pnl!=='' && d.status!=='open') ? `<span class="auto-badge" id="pnl-auto-badge">auto</span>` : ''}
+          </div>
+          <input class="input" type="number" step="any" id="f-pnl" placeholder="Leave blank to auto-calc" value="${d.pnl}" ${d.status==='open'?'disabled':''}>
+          <span class="field-hint ${d.status==='win'?'is-win':d.status==='loss'?'is-loss':''}">${d.status==='loss'?'Saved as a loss':d.status==='win'?'Saved as a win':'\u00A0'}</span>
+        </div>
+        <div>
+          <div class="field-label field-label-row"><span class="fli fli-rr">${svgIcon('ratio')}</span>Risk/Reward</div>
+          <input class="input" type="number" step="any" id="f-rr" placeholder="e.g. 2.5" value="${d.rr}">
+          <span class="field-hint">\u00A0</span>
+        </div>
       </div>
 
-      <div class="field-label">Strategy tags</div>
+      <div class="field-label field-label-row"><span class="fli fli-tags">${svgIcon('tag')}</span>Strategy tags</div>
       <div class="chip-input" id="tag-input-wrap">
         ${d.tags.map(t=>`<div class="chip">${t}<span data-tagrm="${t}">✕</span></div>`).join('')}
         <input type="text" id="f-tag" placeholder="Add tag, press Enter">
       </div>
 
-      <div class="field-label">Notes</div>
+      <div class="field-label field-label-row"><span class="fli fli-notes">${svgIcon('pencil')}</span>Notes</div>
       <textarea class="input" id="f-notes" placeholder="What was your setup, mindset, lessons learned...">${d.notes}</textarea>
     </div>
 
@@ -1565,7 +1863,7 @@ function renderLogTrade(){
 }
 function bindLogTrade(){
   const d = S.draftTrade;
-  const refresh = ()=>{ $('#route-outlet').innerHTML = renderLogTrade(); bindLogTrade(); };
+  const refresh = ()=>{ d._formRendered = true; $('#route-outlet').innerHTML = renderLogTrade(); bindLogTrade(); };
 
   $('#calc-upload').addEventListener('click', (e)=>{ if(e.target.closest('#clear-calc')) return; $('#calc-file').click(); });
   $('#calc-file').addEventListener('change', async (e)=>{
@@ -1605,9 +1903,10 @@ function bindLogTrade(){
 
   if(d.calcImage) renderAnalyzeArea('idle');
 
-  $$('.toggle-opt[data-dir]').forEach(b=>b.addEventListener('click', ()=>{ d.direction=b.dataset.dir; refresh(); }));
+  $$('.toggle-opt[data-dir]').forEach(b=>b.addEventListener('click', ()=>{ d.direction=b.dataset.dir; autoPNL(); refresh(); }));
   $$('.toggle-opt[data-status]').forEach(b=>b.addEventListener('click', ()=>{
     d.status=b.dataset.status;
+    d.statusManual=true; // user picked this explicitly — stop auto-syncing it from the computed P&L
     // keep the P&L sign in sync with the selected result so a mistyped sign can't flip win/loss stats
     if(d.pnl!==''){
       const mag = Math.abs(parseFloat(d.pnl))||0;
@@ -1617,31 +1916,156 @@ function bindLogTrade(){
     // Keep the Exit Price "N/A" checkbox in sync with the chosen result:
     // Open trades have no exit yet, everything else (Win/Loss/B-E) is exited.
     if(d.status==='open'){ d.exitNA = true; d.exit=''; }
-    else { d.exitNA = false; }
+    else { d.exitNA = false; autoExit(); autoPNL(); }
     refresh();
   }));
 
-  $('#f-symbol').addEventListener('input', e=>d.symbol=e.target.value);
-  $('#f-date').addEventListener('input', e=>d.date=e.target.value);
+  $('#f-symbol').addEventListener('input', e=>{ d.symbol=e.target.value; autoPNL(); });
+  $('#f-date').addEventListener('input', e=>{ d.date=e.target.value; refresh(); });
   $('#f-time').addEventListener('input', e=>d.time=e.target.value);
-  $('#f-lots').addEventListener('input', e=>d.lots=e.target.value);
-  $('#f-entry').addEventListener('input', e=>{ d.entry=e.target.value; autoRR(); });
-  $('#f-sl').addEventListener('input', e=>{ d.sl=e.target.value; autoRR(); });
-  $('#f-tp').addEventListener('input', e=>{ d.tp=e.target.value; autoRR(); });
-  $('#f-exit').addEventListener('input', e=>d.exit=e.target.value);
-  $('#f-pnl').addEventListener('input', e=>d.pnl=e.target.value);
+  $$('[data-quickdate]').forEach(el=>el.addEventListener('click', ()=>{
+    d.date = el.dataset.quickdate==='today' ? todayISO() : yesterdayISO();
+    refresh();
+  }));
+  const quickTime = $('[data-quicktime]');
+  if(quickTime) quickTime.addEventListener('click', ()=>{
+    d.time = new Date().toTimeString().slice(0,5);
+    refresh();
+  });
+  $('#f-lots').addEventListener('input', e=>{ d.lots=e.target.value; autoPNL(); });
+  $('#f-entry').addEventListener('input', e=>{ d.entry=e.target.value; autoRR(); autoExit(); autoPNL(); });
+  $('#f-sl').addEventListener('input', e=>{ d.sl=e.target.value; autoRR(); autoExit(); });
+  $('#f-tp').addEventListener('input', e=>{ d.tp=e.target.value; autoRR(); autoExit(); });
+  $('#f-exit').addEventListener('input', e=>{ d.exit=e.target.value; d.exitManual=true; updateExitAutoBadge(); autoPNL(); });
+  $('#f-pnl').addEventListener('input', e=>{ d.pnl=e.target.value; d.pnlManual=true; hideAutoBadge(); });
   $('#f-rr').addEventListener('input', e=>d.rr=e.target.value);
   $('#f-notes').addEventListener('input', e=>d.notes=e.target.value);
 
-  $('#f-slna').addEventListener('change', e=>{ d.slNA=e.target.checked; if(d.slNA) d.sl=''; refresh(); });
-  $('#f-tpna').addEventListener('change', e=>{ d.tpNA=e.target.checked; if(d.tpNA) d.tp=''; refresh(); });
-  $('#f-exitna').addEventListener('change', e=>{ d.exitNA=e.target.checked; if(d.exitNA) d.exit=''; refresh(); });
+  $('#f-slna').addEventListener('change', e=>{ d.slNA=e.target.checked; if(d.slNA) d.sl=''; else autoExit(); refresh(); });
+  $('#f-tpna').addEventListener('change', e=>{ d.tpNA=e.target.checked; if(d.tpNA) d.tp=''; else autoExit(); refresh(); });
+  $('#f-exitna').addEventListener('change', e=>{ d.exitNA=e.target.checked; if(d.exitNA) d.exit=''; else { d.exitManual=false; autoExit(); } autoPNL(); refresh(); });
+
+  // Setting .value directly (rather than calling refresh(), which rebuilds
+  // the whole form's innerHTML) keeps the field the user is actively
+  // typing in focused, while still live-updating the derived read-only-ish
+  // fields (R:R, P&L) next to it as they type.
+  function setDom(id, val){ const el=$(id); if(el) el.value = val; }
+  function hideAutoBadge(){ const b=$('#pnl-auto-badge'); if(b) b.remove(); }
+  function updateAutoBadge(){
+    const labelRow = $('#f-pnl') && $('#f-pnl').previousElementSibling;
+    if(!labelRow || !labelRow.classList.contains('field-label-row')) return;
+    let badge = $('#pnl-auto-badge');
+    const shouldShow = !d.pnlManual && d.pnl!=='' && d.status!=='open';
+    if(shouldShow && !badge){
+      badge = document.createElement('span');
+      badge.id = 'pnl-auto-badge'; badge.className='auto-badge'; badge.textContent='auto';
+      labelRow.appendChild(badge);
+    } else if(!shouldShow && badge){
+      badge.remove();
+    }
+  }
+  function updateExitAutoBadge(){
+    const labelRow = $('#f-exit-label');
+    if(!labelRow) return;
+    let badge = $('#exit-auto-badge');
+    const shouldShow = !d.exitManual && !d.exitNA && d.status!=='open' && d.exit!=='';
+    if(shouldShow && !badge){
+      badge = document.createElement('span');
+      badge.id = 'exit-auto-badge'; badge.className='auto-badge'; badge.textContent='auto';
+      labelRow.appendChild(badge);
+    } else if(!shouldShow && badge){
+      badge.remove();
+    }
+  }
+
+  // Derives the Exit Price straight from the trade's result, the same way
+  // a real closed trade works: a Win exits at Take Profit, a Loss exits at
+  // Stop Loss, and a Break-even exits back at Entry. This only fills the
+  // field in — it never fights the user: as soon as they type into Exit
+  // Price directly it's flagged "manual" (see the #f-exit input handler)
+  // and this stops overwriting it, exactly like the P&L auto-calc above.
+  function autoExit(){
+    if(d.exitManual || d.exitNA || d.status==='open') return;
+    let val = '';
+    if(d.status==='win' && !d.tpNA && d.tp!=='') val = d.tp;
+    else if(d.status==='loss' && !d.slNA && d.sl!=='') val = d.sl;
+    else if(d.status==='breakeven' && d.entry!=='') val = d.entry;
+    if(val!==''){
+      d.exit = val;
+      setDom('#f-exit', d.exit);
+      autoPNL();
+    }
+    updateExitAutoBadge();
+  }
 
   function autoRR(){
     const entry=parseFloat(d.entry), sl=parseFloat(d.sl), tp=parseFloat(d.tp);
     if(!isNaN(entry) && !isNaN(sl) && !isNaN(tp) && entry!==sl){
       d.rr = (Math.abs(tp-entry)/Math.abs(entry-sl)).toFixed(2);
+      setDom('#f-rr', d.rr);
     }
+  }
+
+  // Auto-calculates P&L from Entry, Exit and Lots/Size whenever all three
+  // are known — the user never has to do the math by hand. As soon as the
+  // user types directly into the P&L field it's flagged "manual" and this
+  // stops overwriting it. If there isn't enough info yet (no exit price,
+  // or no lot size), the field is simply left blank so it's obvious it
+  // still needs a manual entry.
+  function contractMultiplier(symbol){
+    const s = (symbol||'').toUpperCase().replace(/[^A-Z]/g,'');
+    // Crypto tickers are usually quoted/sized in whole coins, so "lots"
+    // there means literal quantity — no multiplier.
+    const cryptoPrefixes = ['BTC','ETH','XRP','SOL','DOGE','LTC','BNB','ADA','AVAX','DOT','MATIC','LINK'];
+    if(cryptoPrefixes.some(p=>s.startsWith(p))) return 1;
+    // Standard 6-letter FX/metal pairs (EURUSD, GBPJPY, XAUUSD, XAGUSD...)
+    // are traded in 100,000-unit standard lots, so a 0.0014 price move on
+    // 0.8 lots is a real $112, not $0.001 — this is just a heuristic and
+    // the user can always type over it manually.
+    if(/^[A-Z]{6}$/.test(s)) return 100000;
+    return 1; // stocks/indices/other: treat "lots" as literal unit quantity
+  }
+  function autoPNL(){
+    if(d.pnlManual || d.status==='open') return;
+    const entry=parseFloat(d.entry), exit=parseFloat(d.exit), lots=parseFloat(d.lots);
+    if(!isNaN(entry) && !isNaN(exit) && !isNaN(lots) && lots>0){
+      const diff = d.direction==='short' ? (entry-exit) : (exit-entry);
+      const mult = contractMultiplier(d.symbol);
+      d.pnl = (diff*lots*mult).toFixed(2);
+      // Keep the Win/Loss/B-E result in sync with the *sign* of the P&L we just
+      // computed — unless the user has explicitly picked a result themselves.
+      // Previously the result stayed stuck on the default "Win" no matter what
+      // Entry/Exit worked out to, and saveTrade() forces the P&L sign to match
+      // whatever the result says — so every auto-filled losing trade (negative
+      // diff) was silently getting saved as a positive-P&L win.
+      if(!d.statusManual){
+        const p = parseFloat(d.pnl);
+        d.status = p>0 ? 'win' : p<0 ? 'loss' : 'breakeven';
+        updateStatusToggle();
+      }
+    } else {
+      d.pnl = '';
+    }
+    setDom('#f-pnl', d.pnl);
+    const fli = $('.fli-pnl');
+    if(fli) fli.classList.toggle('neg', parseFloat(d.pnl)<0);
+    updateAutoBadge();
+  }
+  // Live-updates the Win/Loss/B-E/Open toggle buttons and the "Saved as a
+  // win/loss" hint without doing a full refresh() (which would blow away
+  // whatever field the user is mid-typing in).
+  function updateStatusToggle(){
+    $$('.toggle-opt[data-status]').forEach(b=>{
+      b.classList.toggle('active', b.dataset.status===d.status);
+    });
+    const hint = $('#f-pnl') && $('#f-pnl').parentElement && $('#f-pnl').parentElement.querySelector('.field-hint');
+    if(hint){
+      hint.classList.toggle('is-win', d.status==='win');
+      hint.classList.toggle('is-loss', d.status==='loss');
+      hint.textContent = d.status==='loss' ? 'Saved as a loss' : d.status==='win' ? 'Saved as a win' : '\u00A0';
+    }
+    const exitNaBox = $('#f-exitna');
+    if(exitNaBox && d.status==='open' && !exitNaBox.checked){ exitNaBox.checked = true; }
   }
 
   const tagInput = $('#f-tag');
@@ -1678,12 +2102,64 @@ function bindLogTrade(){
       if(json.entry_price!=null) d.entry = json.entry_price;
       if(json.stop_loss!=null){ d.sl = json.stop_loss; d.slNA=false; }
       if(json.take_profit!=null){ d.tp = json.take_profit; d.tpNA=false; }
+      // Exit price wasn't being read from the backend response at all before —
+      // if the calculator screenshot / OCR result includes a closed/exit
+      // price, pick it up and enable the field automatically instead of
+      // leaving the user to type it in by hand. This counts as a "given"
+      // value (like a manual entry) so the Win/Loss/B-E-based auto-exit
+      // below never overwrites what the backend actually read.
+      if(json.exit_price!=null || json.exit!=null || json.close_price!=null){
+        d.exit = json.exit_price ?? json.exit ?? json.close_price;
+        d.exitNA = false;
+        d.exitManual = true;
+      } else if(!d.exitNA && d.status!=='open'){
+        // Backend didn't report an exit — derive it from the result
+        // (Win→TP, Loss→SL, B/E→Entry) using whatever SL/TP/Entry it did read.
+        d.exitManual = false;
+        autoExit();
+      }
       if(json.risk_reward_ratio!=null) d.rr = json.risk_reward_ratio;
       if(json.direction) d.direction = json.direction;
-      if(json.closed_pnl!=null) d.pnl = json.closed_pnl;
-      if(json.qty!=null) d.lots = json.qty;
+      // Lots/Size and P&L are intentionally NOT auto-filled from the backend
+      // — OCR'd position size and P&L are unreliable, so both fields are
+      // left blank here. The user enters the lot size themselves and P&L
+      // is then auto-calculated from Entry/Exit/Lots (see autoPNL()); if
+      // there still isn't enough info to calculate it, it just stays blank
+      // for manual entry.
+      // Fallback: if the backend didn't report a risk/reward ratio but we
+      // do have entry/SL/TP, derive it the same way manual entry does —
+      // this covers cases where the OCR read the price levels fine but
+      // missed/misread the "Risk/reward ratio:" line specifically.
+      if((d.rr===''||d.rr==null) && d.entry!=='' && d.sl!=='' && d.tp!==''){
+        const entryN=parseFloat(d.entry), slN=parseFloat(d.sl), tpN=parseFloat(d.tp);
+        if(!isNaN(entryN) && !isNaN(slN) && !isNaN(tpN) && entryN!==slN){
+          d.rr = (Math.abs(tpN-entryN)/Math.abs(entryN-slN)).toFixed(2);
+        }
+      }
+      autoPNL();
       renderAnalyzeArea('success', json.warnings);
-      refresh();
+      // Patch the changed fields in place instead of calling refresh().
+      // refresh() replaces the whole form's innerHTML, which re-creates
+      // every .card element and replays its slide-in animation -- that's
+      // what caused fields (like Risk/Reward) to visibly "jump" every
+      // time a screenshot was analyzed. Updating values directly avoids
+      // the reflow/reanimate entirely.
+      const setVal = (id, val) => { const el = $(id); if(el && val!=null) el.value = val; };
+      setVal('#f-entry', d.entry);
+      setVal('#f-sl', d.sl);
+      setVal('#f-tp', d.tp);
+      setVal('#f-exit', d.exit);
+      setVal('#f-rr', d.rr);
+      const slNaBox = $('#f-slna'); if(slNaBox) slNaBox.checked = !!d.slNA;
+      const tpNaBox = $('#f-tpna'); if(tpNaBox) tpNaBox.checked = !!d.tpNA;
+      const exitNaBox = $('#f-exitna'); if(exitNaBox) exitNaBox.checked = !!d.exitNA;
+      const slInput = $('#f-sl'); if(slInput) slInput.disabled = !!d.slNA;
+      const tpInput = $('#f-tp'); if(tpInput) tpInput.disabled = !!d.tpNA;
+      const exitInput = $('#f-exit'); if(exitInput) exitInput.disabled = !!d.exitNA;
+      updateExitAutoBadge();
+      if(json.direction){
+        $$('.toggle-opt[data-dir]').forEach(b=>b.classList.toggle('active', b.dataset.dir===d.direction));
+      }
     }catch(err){
       renderAnalyzeArea('error', [err.message]);
     }
@@ -1737,7 +2213,7 @@ async function saveTrade(){
   } else {
     const id = await dbPut('trades', trade);
     trade.id = id;
-    S.trades.push(trade);
+    S.trades = [...S.trades, trade];
     toast('Trade saved');
   }
   S.draftTrade = null;
@@ -1750,30 +2226,39 @@ function renderHistory(){
   let trades = allSorted();
   if(S.historyFilter==='win') trades = trades.filter(t=>t.pnl>0 && t.status!=='open');
   else if(S.historyFilter==='loss') trades = trades.filter(t=>t.pnl<0 && t.status!=='open');
+  else if(S.historyFilter==='breakeven') trades = trades.filter(t=>t.status==='breakeven');
   else if(S.historyFilter==='open') trades = trades.filter(t=>t.status==='open');
 
-  const rows = trades.map((t,i)=>`
-    <div class="trade-card" data-tid="${t.id}">
-      ${t.bannerImage ? `<img src="${t.bannerImage}" class="trade-banner">` : `<div class="trade-banner ph">${t.symbol.slice(0,4)}</div>`}
+  const rows = trades.map((t,i)=>{
+    const amtClass = t.status==='open' ? 'openstat' : t.status==='breakeven' ? 'be' : (t.pnl>=0?'pos':'neg');
+    const statusTag = t.status==='open'
+      ? `<span class="status-tag openstat">${svgIcon('hourglass')}Open</span>`
+      : t.status==='breakeven'
+        ? `<span class="status-tag be">${svgIcon('equal')}B/E</span>`
+        : '';
+    return `
+    <div class="trade-card" data-tid="${t.id}" style="animation-delay:${Math.min(i*.04,.4)}s">
+      ${t.bannerImage ? `<img src="${t.bannerImage}" class="trade-banner" loading="lazy" decoding="async">` : `<div class="trade-banner ph">${t.symbol.slice(0,4)}</div>`}
       <div class="trade-info">
-        <div class="trade-symbol-row"><span class="trade-symbol">${t.symbol}</span><span class="dir-badge ${t.direction}">${t.direction}</span></div>
-        <div class="trade-meta">${t.lots?t.lots+' lots · ':''}${fmtDate(t.date)}${t.status==='open'?' · Open':''}</div>
+        <div class="trade-symbol-row"><span class="trade-symbol">${t.symbol}</span><span class="dir-badge ${t.direction}">${t.direction}</span>${statusTag}</div>
+        <div class="trade-meta">${t.lots?t.lots+' lots · ':''}${fmtDate(t.date)}</div>
       </div>
       <div class="trade-pnl">
-        <div class="amt ${t.pnl>=0?'pos':'neg'}">${t.status==='open'?'—':fmtMoney(t.pnl,true)}</div>
+        <div class="amt ${amtClass}">${t.status==='open'?'—':fmtMoney(t.pnl,true)}</div>
         <div class="date">${t.rr?t.rr+'R':''}</div>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 
   return `
   <div class="page">
     <div class="page-title">Journal</div>
     <div class="page-sub">${S.trades.length} trade${S.trades.length===1?'':'s'} logged</div>
     <div class="filter-chips">
-      <div class="fchip ${S.historyFilter==='all'?'active':''}" data-f="all">All</div>
-      <div class="fchip ${S.historyFilter==='win'?'active':''}" data-f="win">Wins</div>
-      <div class="fchip ${S.historyFilter==='loss'?'active':''}" data-f="loss">Losses</div>
-      <div class="fchip ${S.historyFilter==='open'?'active':''}" data-f="open">Open</div>
+      <div class="fchip ${S.historyFilter==='all'?'active':''}" data-f="all"><span class="fcicon">${svgIcon('layers')}</span>All</div>
+      <div class="fchip fc-win ${S.historyFilter==='win'?'active':''}" data-f="win"><span class="fcicon">${svgIcon('trophy')}</span>Wins</div>
+      <div class="fchip fc-loss ${S.historyFilter==='loss'?'active':''}" data-f="loss"><span class="fcicon">${svgIcon('close')}</span>Losses</div>
+      <div class="fchip fc-be ${S.historyFilter==='breakeven'?'active':''}" data-f="breakeven"><span class="fcicon">${svgIcon('equal')}</span>B/E</div>
+      <div class="fchip fc-open ${S.historyFilter==='open'?'active':''}" data-f="open"><span class="fcicon">${svgIcon('hourglass')}</span>Open</div>
     </div>
     ${rows || `<div class="empty"><div class="empty-icon">📓</div><h3>No trades here yet</h3><p>Tap the + button to log your first trade.</p></div>`}
   </div>`;
@@ -1787,13 +2272,15 @@ function openTradeDetail(){
   openSheet(`
     <div class="sheet-handle"></div>
     <div class="sheet-title">${t.symbol} <button class="sheet-close" id="sheet-close">${svgIcon('close')}</button></div>
-    ${t.bannerImage?`<img src="${t.bannerImage}" class="detail-banner">`:''}
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+    ${t.bannerImage?`<div class="detail-banner-wrap"><img src="${t.bannerImage}" class="detail-banner" loading="lazy" decoding="async"></div>`:''}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
       <span class="dir-badge ${t.direction}">${t.direction}</span>
+      ${t.status==='open'?`<span class="status-tag openstat">${svgIcon('hourglass')}Open</span>`:''}
+      ${t.status==='breakeven'?`<span class="status-tag be">${svgIcon('equal')}Break-even</span>`:''}
       <span style="color:var(--text-dim);font-size:12.5px;">${fmtDate(t.date)} ${t.time||''}</span>
     </div>
-    <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;margin:6px 0 2px;color:${t.status==='open'?'var(--text)':(t.pnl>=0?'var(--blue2)':'var(--red)')}">
-      ${t.status==='open'?'Open Position':fmtMoney(t.pnl,true)}
+    <div style="font-family:'Space Grotesk';font-size:26px;font-weight:700;margin:6px 0 2px;color:${t.status==='open'?'var(--orange)':t.status==='breakeven'?'var(--purple)':(t.pnl>=0?'var(--blue2)':'var(--red)')}">
+      ${t.status==='open'?'Open Position':t.status==='breakeven'?fmtMoney(t.pnl,true)+' (Break-even)':fmtMoney(t.pnl,true)}
     </div>
     <div class="detail-grid">
       <div class="detail-cell"><div class="k">Entry</div><div class="v">${t.entry ?? '—'}</div></div>
@@ -1805,7 +2292,7 @@ function openTradeDetail(){
     </div>
     ${t.tags && t.tags.length ? `<div class="legend-row" style="margin-bottom:10px;">${t.tags.map(tg=>`<div class="chip">${tg}</div>`).join('')}</div>` : ''}
     ${t.notes ? `<div class="card" style="margin-top:2px;"><div class="field-label" style="margin-top:0;">Notes</div><div style="font-size:13.5px;line-height:1.5;color:var(--text-dim);">${t.notes.replace(/</g,'&lt;')}</div></div>` : ''}
-    ${t.calcImage ? `<div class="field-label">Calculator screenshot</div><img src="${t.calcImage}" style="width:100%;border-radius:14px;">` : ''}
+    ${t.calcImage ? `<div class="field-label">Calculator screenshot</div><img src="${t.calcImage}" style="width:100%;border-radius:14px;" loading="lazy" decoding="async">` : ''}
     <div style="display:flex;gap:10px;margin-top:16px;">
       <button class="btn btn-danger" style="flex:1;" id="btn-del-trade">${svgIcon('trash')} Delete</button>
       <button class="btn btn-ghost" style="flex:2;" id="btn-edit-trade">${svgIcon('edit')} Edit</button>
@@ -1822,8 +2309,8 @@ function openTradeDetail(){
   $('#btn-edit-trade').addEventListener('click', ()=>{
     S.draftTrade = {
       date:t.date, time:t.time||'', symbol:t.symbol, direction:t.direction, lots:t.lots??'', entry:t.entry??'',
-      sl:t.sl??'', tp:t.tp??'', exit:t.exit??'', slNA: t.sl==null, tpNA: t.tp==null, exitNA: t.exit==null,
-      status:t.status, pnl:t.pnl??'', rr:t.rr??'', tags:t.tags||[], notes:t.notes||'',
+      sl:t.sl??'', tp:t.tp??'', exit:t.exit??'', slNA: t.sl==null, tpNA: t.tp==null, exitNA: t.exit==null, exitManual:true,
+      status:t.status, statusManual:true, pnl:t.pnl??'', pnlManual:true, rr:t.rr??'', tags:t.tags||[], notes:t.notes||'',
       calcImage:t.calcImage, bannerImage:t.bannerImage, durationMin:t.durationMin??'', editingId:t.id,
     };
     closeSheet(); S.route='log'; renderRoute();
