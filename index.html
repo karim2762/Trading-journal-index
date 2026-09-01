@@ -2685,7 +2685,7 @@ function renderSettings(){
 
     <div class="section-head" style="margin-left:2px;margin-right:2px;"><div class="section-title"><span class="dot"></span>Sync between devices</div></div>
     <div class="card">
-      <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.5;">No file, no account — generate a code on this device, then enter it on the other one to bring everything across.</p>
+      <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.5;">No file, no account — generate a code on this device, then enter it on the other one to bring everything across. Keep both devices online and unlocked during the transfer.</p>
       <div class="set-row" style="align-items:flex-start;">
         <div class="l"><b>Send from this device</b><small>Creates a one-time code with your data</small></div>
         <button class="btn btn-ghost btn-sm" id="btn-sync-generate">${svgIcon('sync')} Get code</button>
@@ -2693,10 +2693,10 @@ function renderSettings(){
       <div style="height:1px;background:var(--border);margin:14px 0;"></div>
       <div class="field-label" style="margin-top:0;">Receive on this device</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <input class="input" id="sync-code-input" placeholder="Enter code" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;box-sizing:border-box;text-align:center;font-family:'Space Grotesk',monospace;font-size:24px;font-weight:700;letter-spacing:3px;padding:16px 10px;height:auto;">
+        <input class="input" id="sync-code-input" placeholder="Enter code" maxlength="6" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="width:100%;box-sizing:border-box;text-align:center;text-transform:uppercase;font-family:'Space Grotesk',monospace;font-size:28px;font-weight:700;letter-spacing:6px;padding:16px 10px;height:auto;">
         <button class="btn btn-primary btn-block" id="btn-sync-redeem">Sync</button>
       </div>
-      <div style="font-size:11px;color:var(--text-dim2);margin-top:10px;line-height:1.5;">Codes are single-use and work over the internet — no sign-in required. Receiving overwrites the data currently on this device.</div>
+      <div style="font-size:11px;color:var(--text-dim2);margin-top:10px;line-height:1.5;">Data is sent directly, device-to-device — no sign-in, and nothing is stored on a server in between. Receiving overwrites the data currently on this device.</div>
     </div>
 
     <div class="section-head" style="margin-left:2px;margin-right:2px;"><div class="section-title"><span class="dot"></span>Reports</div></div>
@@ -3175,60 +3175,204 @@ async function importData(e){
 }
 
 /* ---------------- Sync via code (no file, cross-device, no sign-in) ----------------
-   Uses jsonblob.com — a free, anonymous JSON storage API that needs no account,
-   no API key, and works from any browser (unlike window.storage, which only
-   exists when this app is embedded inside Claude). A blob is created holding
-   your data; its ID is shown as the "code"; the other device fetches that blob
-   by ID, imports it, then the blob is deleted so the code can't be reused. */
-const JSONBLOB_API = 'https://jsonblob.com/api/jsonBlob';
+   Uses PeerJS (WebRTC) with its free public broker — no account, no API key,
+   no backend of our own. This is a direct browser-to-browser transfer: nothing
+   ever touches a third-party database, so there's no CORS or storage-quota
+   dependency to fail. The "code" is just the ID one browser listens on; the
+   other browser dials it directly. Both devices need to be online for the
+   few seconds the transfer takes — after that, the code is gone. */
+const SYNC_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid mix-ups
+const SYNC_ID_PREFIX = 'tj9-';
+let PEERJS_LOAD_PROMISE = null;
+let syncSenderPeer = null;
 
-function syncFormatCodeForDisplay(code){
-  return code.replace(/(.{4})/g, '$1 ').trim();
+const PEERJS_CDN_URLS = [
+  'https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js',
+  'https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js'
+];
+
+function loadScriptOnce(src, timeoutMs){
+  return new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    let done = false;
+    const timer = setTimeout(()=>{
+      if(done) return;
+      done = true;
+      s.remove();
+      reject(new Error('timed out'));
+    }, timeoutMs);
+    s.src = src;
+    s.onload = ()=>{
+      if(done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    s.onerror = ()=>{
+      if(done) return;
+      done = true;
+      clearTimeout(timer);
+      s.remove();
+      reject(new Error('failed to load'));
+    };
+    document.head.appendChild(s);
+  });
+}
+
+function loadPeerJS(){
+  if(typeof Peer !== 'undefined') return Promise.resolve();
+  // Only reuse an in-flight load — never reuse a *failed* one, or every
+  // later attempt (e.g. a temporary network blip) would replay the same
+  // stale rejection forever without ever retrying.
+  if(PEERJS_LOAD_PROMISE) return PEERJS_LOAD_PROMISE;
+  PEERJS_LOAD_PROMISE = (async ()=>{
+    let lastErr = null;
+    for(const url of PEERJS_CDN_URLS){
+      if(typeof Peer !== 'undefined') return;
+      try{
+        await loadScriptOnce(url, 8000);
+        if(typeof Peer !== 'undefined') return;
+        lastErr = new Error('script loaded but Peer is undefined');
+      }catch(err){
+        lastErr = err;
+      }
+    }
+    throw new Error('Could not load the sync library — check your connection');
+  })();
+  // Clear the cached promise on failure so the next attempt retries fresh.
+  PEERJS_LOAD_PROMISE.catch(()=>{ PEERJS_LOAD_PROMISE = null; });
+  return PEERJS_LOAD_PROMISE;
+}
+function syncGenCode(){
+  let c = '';
+  for(let i=0;i<6;i++) c += SYNC_CODE_CHARS[Math.floor(Math.random()*SYNC_CODE_CHARS.length)];
+  return c;
 }
 function syncCleanCodeInput(raw){
-  return raw.replace(/\s+/g,'').replace(/[^0-9A-Za-z]/g,'');
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+}
+function syncFormatCodeForDisplay(code){
+  return code.split('').join(' ');
+}
+async function copyTextToClipboard(text){
+  // Try the modern Clipboard API first — it can silently fail in embedded/
+  // sandboxed webviews that don't grant clipboard-write permission, so we
+  // fall back to the older execCommand approach via a hidden textarea.
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch{}
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.left = '-1000px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if(ok) return true;
+  }catch{}
+  return false;
+}
+function selectTextForManualCopy(el){
+  if(!el) return;
+  try{
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }catch{}
+}
+function syncCleanupSender(){
+  if(syncSenderPeer){ try{ syncSenderPeer.destroy(); }catch{} syncSenderPeer = null; }
 }
 
 async function syncGenerateCode(){
   const btn = $('#btn-sync-generate');
   const origLabel = btn.innerHTML;
-  btn.innerHTML = 'Generating…'; btn.disabled = true;
+  btn.innerHTML = 'Loading…'; btn.disabled = true;
+  syncCleanupSender();
   try{
+    await loadPeerJS();
     const payload = await buildBackupPayload();
     const json = JSON.stringify(payload);
-    if(json.length > 4500000){
+    if(json.length > 20000000){
       toast('Data too large to sync by code — use Export/Import file instead');
       return;
     }
-    const res = await fetch(JSONBLOB_API, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Accept':'application/json'},
-      body: json
-    });
-    if(!res.ok) throw new Error('Server said no (HTTP '+res.status+')');
-    const location = res.headers.get('Location') || res.headers.get('location');
-    if(!location) throw new Error('Could not get a code back, try again');
-    const code = location.split('/').pop();
+    const code = syncGenCode();
+    const peer = new Peer(SYNC_ID_PREFIX + code.toLowerCase());
+    syncSenderPeer = peer;
+    let settled = false;
+    let expiryTimer = null;
+
     openSheet(`
       <div class="sheet-handle"></div>
       <div class="sheet-title">Sync code <button class="sheet-close" id="sheet-close">${svgIcon('close')}</button></div>
       <div style="padding:4px 4px 6px;">
-        <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 18px;line-height:1.5;">Enter this code in <b>Settings → Receive on this device</b> on your other device. No account needed — it works over the internet.</p>
+        <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 18px;line-height:1.5;">Enter this code in <b>Settings → Receive on this device</b> on your other device — <b>keep this screen open</b> until it connects.</p>
         <div style="display:flex;justify-content:center;">
-          <div id="sync-code-display" style="font-family:'Space Grotesk';font-size:26px;font-weight:700;letter-spacing:3px;background:var(--card-2,rgba(127,127,127,.08));border:1px solid var(--border);border-radius:14px;padding:20px 12px;text-align:center;width:100%;max-width:340px;word-break:break-all;line-height:1.4;">${syncFormatCodeForDisplay(code)}</div>
+          <div id="sync-code-display" style="font-family:'Space Grotesk';font-size:34px;font-weight:700;letter-spacing:5px;background:var(--card-2,rgba(127,127,127,.08));border:1px solid var(--border);border-radius:14px;padding:20px 10px;text-align:center;width:100%;max-width:340px;">${syncFormatCodeForDisplay(code)}</div>
         </div>
         <button class="btn btn-ghost btn-block" id="btn-sync-copy" style="margin-top:14px;">${svgIcon('copy')} Copy code</button>
-        <div style="font-size:11px;color:var(--text-dim2);margin-top:14px;line-height:1.5;text-align:center;">Includes your profile, trades, and dashboard layout. The code is consumed the moment it's used on the other device.</div>
-        <button class="btn btn-primary btn-block" id="btn-sync-done" style="margin-top:16px;">Done</button>
+        <div id="sync-status" style="font-size:12px;color:var(--text-dim2);margin-top:14px;line-height:1.5;text-align:center;">Waiting for the other device…</div>
+        <button class="btn btn-primary btn-block" id="btn-sync-done" style="margin-top:16px;">Cancel</button>
       </div>`);
-    $('#sheet-close').addEventListener('click', closeSheet);
-    $('#btn-sync-done').addEventListener('click', closeSheet);
+    const statusEl = $('#sync-status');
+    const cleanupAndClose = ()=>{ clearTimeout(expiryTimer); syncCleanupSender(); closeSheet(); };
+    $('#sheet-close').addEventListener('click', cleanupAndClose);
+    $('#btn-sync-done').addEventListener('click', cleanupAndClose);
     $('#btn-sync-copy').addEventListener('click', async ()=>{
-      try{ await navigator.clipboard.writeText(code); toast('Code copied'); }
-      catch{ toast('Could not copy — select it manually'); }
+      if(await copyTextToClipboard(code)){
+        toast('Code copied');
+      }else{
+        selectTextForManualCopy($('#sync-code-display'));
+        toast('Couldn\'t auto-copy — code is selected, use your keyboard/menu to copy');
+      }
     });
+
+    peer.on('connection', (conn)=>{
+      conn.on('open', ()=>{
+        conn.send(json);
+        if(statusEl) statusEl.textContent = 'Connected — sending…';
+        setTimeout(()=>{
+          if(settled) return;
+          settled = true;
+          toast('Synced successfully');
+          clearTimeout(expiryTimer);
+          conn.close();
+          syncCleanupSender();
+          closeSheet();
+        }, 900);
+      });
+    });
+    peer.on('error', (err)=>{
+      if(settled) return;
+      settled = true;
+      clearTimeout(expiryTimer);
+      toast('Sync failed: '+(err.type || err.message || 'connection error')+' — try Export/Import instead');
+      syncCleanupSender();
+      closeSheet();
+    });
+    expiryTimer = setTimeout(()=>{
+      if(settled) return;
+      settled = true;
+      toast('Code expired — generate a new one');
+      syncCleanupSender();
+      closeSheet();
+    }, 5*60*1000);
   }catch(err){
     toast('Could not generate code: '+err.message+' — try Export/Import instead');
+    syncCleanupSender();
   }finally{
     btn.innerHTML = origLabel; btn.disabled = false;
   }
@@ -3240,29 +3384,70 @@ async function syncRedeemCode(){
   if(code.length < 6){ toast('Enter the code from your other device'); return; }
   const btn = $('#btn-sync-redeem');
   const origLabel = btn.textContent;
-  btn.textContent = 'Syncing…'; btn.disabled = true;
+  btn.textContent = 'Connecting…'; btn.disabled = true;
+  let peer = null;
+  let settled = false;
+  const finish = ()=>{ btn.textContent = origLabel; btn.disabled = false; };
   try{
-    const res = await fetch(JSONBLOB_API+'/'+encodeURIComponent(code), {
-      headers: {'Accept':'application/json'}
+    await loadPeerJS();
+    peer = new Peer();
+    const timeout = setTimeout(()=>{
+      if(settled) return;
+      settled = true;
+      toast('Could not find that device — make sure the code is current and both devices are online');
+      try{ peer.destroy(); }catch{}
+      finish();
+    }, 20000);
+
+    peer.on('open', ()=>{
+      const conn = peer.connect(SYNC_ID_PREFIX + code.toLowerCase(), {reliable:true});
+      conn.on('data', async (json)=>{
+        if(settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        try{
+          const data = JSON.parse(json);
+          if(!data.profile || !Array.isArray(data.trades)) throw new Error('That code sent invalid data');
+          if(!confirm(`Import ${data.trades.length} trades and overwrite the data on this device?`)){
+            finish(); try{ peer.destroy(); }catch{}
+            return;
+          }
+          await dbClearAll();
+          await dbPut('profile', data.profile);
+          await dbPut('settings', data.settings || {id:1, backendUrl:'', currency:'USD'});
+          for(const t of data.trades) await dbPut('trades', t);
+          for(const w of (data.widgets||[])) await dbPut('widgets', w);
+          input.value = '';
+          toast('Synced successfully');
+          try{ conn.close(); peer.destroy(); }catch{}
+          setTimeout(()=>location.reload(), 700);
+        }catch(err){
+          toast('Sync failed: '+err.message+' — try Export/Import instead');
+          finish(); try{ peer.destroy(); }catch{}
+        }
+      });
+      conn.on('error', (err)=>{
+        if(settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        toast('Sync failed: '+(err.type || err.message || 'connection error')+' — try Export/Import instead');
+        finish(); try{ peer.destroy(); }catch{}
+      });
     });
-    if(res.status === 404){ toast('Code not found or already used'); return; }
-    if(!res.ok) throw new Error('Server said no (HTTP '+res.status+')');
-    const data = await res.json();
-    if(!data.profile || !Array.isArray(data.trades)) throw new Error('That code has invalid data');
-    if(!confirm(`Import ${data.trades.length} trades and overwrite the data on this device?`)) return;
-    await dbClearAll();
-    await dbPut('profile', data.profile);
-    await dbPut('settings', data.settings || {id:1, backendUrl:'', currency:'USD'});
-    for(const t of data.trades) await dbPut('trades', t);
-    for(const w of (data.widgets||[])) await dbPut('widgets', w);
-    try{ await fetch(JSONBLOB_API+'/'+encodeURIComponent(code), {method:'DELETE'}); }catch{}
-    input.value = '';
-    toast('Synced successfully');
-    setTimeout(()=>location.reload(), 700);
+    peer.on('error', (err)=>{
+      if(settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if(err.type === 'peer-unavailable'){
+        toast('Code not found or already used');
+      }else{
+        toast('Sync failed: '+(err.type || err.message || 'connection error')+' — try Export/Import instead');
+      }
+      finish(); try{ peer.destroy(); }catch{}
+    });
   }catch(err){
-    toast('Sync failed: '+err.message+' — try Export/Import instead');
-  }finally{
-    btn.textContent = origLabel; btn.disabled = false;
+    toast('Could not start sync: '+err.message+' — try Export/Import instead');
+    finish();
   }
 }
 </script>
