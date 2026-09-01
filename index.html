@@ -2037,7 +2037,7 @@ function renderLogTrade(){
             <span class="fli fli-pnl ${parseFloat(d.pnl)<0?'neg':''}">${svgIcon('dollar')}</span>P&L Amount ($)
             ${(!d.pnlManual && d.pnl!=='' && d.status!=='open') ? `<span class="auto-badge" id="pnl-auto-badge">auto</span>` : ''}
           </div>
-          <input class="input" type="number" step="any" id="f-pnl" placeholder="Leave blank to auto-calc" value="${d.pnl}" ${d.status==='open'?'disabled':''}>
+          <input class="input" type="number" step="any" id="f-pnl" placeholder="e.g +150$" value="${d.pnl}" ${d.status==='open'?'disabled':''}>
           <span class="field-hint ${d.status==='win'?'is-win':d.status==='loss'?'is-loss':''}">${d.status==='loss'?'Saved as a loss':d.status==='win'?'Saved as a win':'\u00A0'}</span>
         </div>
         <div>
