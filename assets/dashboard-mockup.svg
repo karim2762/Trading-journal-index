@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 780" width="380" height="780">
+
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff"/><stop offset="100%" stop-color="#5b93ff"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12b76a"/><stop offset="100%" stop-color="#5fe3a1"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f79009"/><stop offset="100%" stop-color="#ffc069"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f9a8d4"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <linearGradient id="balanceFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="bgBlobBlue" cx="20%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.16"/><stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPurple" cx="100%" cy="10%" r="55%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.14"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobGreen" cx="50%" cy="115%" r="55%">
+      <stop offset="0%" stop-color="#12b76a" stop-opacity="0.12"/><stop offset="100%" stop-color="#12b76a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPink" cx="90%" cy="95%" r="45%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.10"/><stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#14213c" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .f { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .disp { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+
+  <rect width="380" height="780" fill="#eef1f8"/>
+  <rect width="380" height="780" fill="url(#bgBlobBlue)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPurple)"/>
+  <rect width="380" height="780" fill="url(#bgBlobGreen)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPink)"/>
+
+
+  <rect x="0" y="0" width="380" height="780" rx="30" fill="#ffffff" stroke="#e2e6f0" stroke-width="2"/>
+
+<circle cx="34" cy="40" r="17" fill="url(#blueGrad)"/>
+<text x="34" y="46" text-anchor="middle" class="disp" font-size="15" fill="#fff">A</text>
+<text x="60" y="36" class="f" font-size="11" fill="#a4abbd">Welcome back</text>
+<text x="60" y="52" class="disp" font-size="16" fill="#101423">Alex's Journal</text>
+<circle cx="336" cy="40" r="17" fill="#f3f5fb" stroke="#e8ebf3"/>
+<circle cx="341" cy="33" r="4" fill="#e5484d"/>
+<path d="M330 44 q6 -12 12 0" stroke="#767e93" stroke-width="1.6" fill="none"/>
+<rect x="24" y="74" width="332" height="168" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="42" y="102" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">BALANCE</text>
+<rect x="264" y="89" width="76" height="22" rx="11" fill="rgba(47,107,255,.12)"/>
+<text x="302" y="104" text-anchor="middle" class="disp" font-size="12" fill="#2f6bff">+12.4%</text>
+<text x="42" y="136" class="disp" font-size="30" fill="#101423">$11,240.50</text>
+<path d="M 42,246 L 72,238 L 102,244 L 132,226 L 162,230 L 192,212 L 222,218 L 252,204 L 282,210 L 312,196 L 342,202 L 342,224 L 42,224 Z" fill="url(#balanceFill)"/>
+<path d="M 42,246 L 72,238 L 102,244 L 132,226 L 162,230 L 192,212 L 222,218 L 252,204 L 282,210 L 312,196 L 342,202" fill="none" stroke="#2f6bff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="342" cy="202" r="4" fill="#2f6bff"/>
+<rect x="24" y="258" width="158" height="148" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="40" y="284" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">NET P&amp;L</text>
+<text x="40" y="312" class="disp" font-size="21" fill="#12b76a">+$1,240.50</text>
+<rect x="40" y="354" width="9" height="22" rx="3" fill="#e5484d" opacity="0.85"/>
+<rect x="56" y="336" width="9" height="40" rx="3" fill="#12b76a" opacity="0.85"/>
+<rect x="72" y="362" width="9" height="14" rx="3" fill="#e5484d" opacity="0.85"/>
+<rect x="88" y="328" width="9" height="48" rx="3" fill="#12b76a" opacity="0.85"/>
+<rect x="104" y="346" width="9" height="30" rx="3" fill="#12b76a" opacity="0.85"/>
+<rect x="120" y="318" width="9" height="58" rx="3" fill="#12b76a" opacity="0.85"/>
+<rect x="136" y="356" width="9" height="20" rx="3" fill="#e5484d" opacity="0.85"/>
+<rect x="152" y="332" width="9" height="44" rx="3" fill="#12b76a" opacity="0.85"/>
+<text x="40" y="392" class="f" font-size="10" fill="#a4abbd">42 closed trades</text>
+<rect x="198" y="258" width="158" height="148" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="214" y="284" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">WIN RATE</text>
+<path d="M 277.0 304.0 A 44 44 0 1 1 237.2 366.7" fill="none" stroke="#2f6bff" stroke-width="12" stroke-linecap="round"/>
+<path d="M 237.2 366.7 A 44 44 0 0 1 277.0 304.0" fill="none" stroke="#e5484d" stroke-width="12" stroke-linecap="round"/>
+<text x="277" y="346" text-anchor="middle" class="disp" font-size="19" fill="#101423">68%</text>
+<text x="277" y="362" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Win Rate</text>
+<rect x="24" y="422" width="158" height="140" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="40" y="448" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">SYMBOLS TRADED</text>
+<path d="M 103.0 470.0 A 34 34 0 0 1 123.0 531.5" fill="none" stroke="#2f6bff" stroke-width="10" stroke-linecap="round"/>
+<path d="M 123.0 531.5 A 34 34 0 0 1 75.5 524.0" fill="none" stroke="#8b5cf6" stroke-width="10" stroke-linecap="round"/>
+<path d="M 75.5 524.0 A 34 34 0 0 1 75.5 484.0" fill="none" stroke="#f79009" stroke-width="10" stroke-linecap="round"/>
+<path d="M 75.5 484.0 A 34 34 0 0 1 103.0 470.0" fill="none" stroke="#06b6d4" stroke-width="10" stroke-linecap="round"/>
+<text x="103" y="508" text-anchor="middle" class="disp" font-size="14" fill="#101423">4</text>
+<circle cx="40" cy="540" r="4" fill="#2f6bff"/>
+<text x="46" y="544" class="f" font-size="9" fill="#767e93">EURUSD</text>
+<circle cx="112" cy="540" r="4" fill="#8b5cf6"/>
+<text x="118" y="544" class="f" font-size="9" fill="#767e93">XAUUSD</text>
+<rect x="198" y="422" width="158" height="140" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="214" y="448" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">WIN STREAK</text>
+<text x="214" y="488" class="disp" font-size="30" fill="#101423">7🔥</text>
+<rect x="214" y="506" width="64" height="20" rx="10" fill="rgba(18,183,106,.12)"/>
+<text x="246" y="520" text-anchor="middle" class="disp" font-size="10" fill="#12b76a">BEST 7</text>
+<rect x="214" y="532" width="70" height="20" rx="10" fill="rgba(229,72,77,.12)"/>
+<text x="249" y="546" text-anchor="middle" class="disp" font-size="10" fill="#e5484d">WORST 3</text>
+<rect x="0" y="710" width="380" height="70" fill="#ffffff" stroke="#e8ebf3"/>
+<circle cx="38" cy="734" r="4" fill="#2f6bff"/>
+<text x="38" y="758" text-anchor="middle" class="f" font-size="9" fill="#2f6bff">Home</text>
+<circle cx="114" cy="734" r="4" fill="#a4abbd"/>
+<text x="114" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Trades</text>
+<circle cx="190" cy="740" r="24" fill="url(#blueGrad)"/>
+<text x="190" y="747" text-anchor="middle" fill="#fff" font-size="22" class="disp">+</text>
+<circle cx="266" cy="734" r="4" fill="#a4abbd"/>
+<text x="266" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Analytics</text>
+<circle cx="342" cy="734" r="4" fill="#a4abbd"/>
+<text x="342" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Settings</text>
+</svg>

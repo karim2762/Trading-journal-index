@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 780" width="380" height="780">
+
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff"/><stop offset="100%" stop-color="#5b93ff"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12b76a"/><stop offset="100%" stop-color="#5fe3a1"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f79009"/><stop offset="100%" stop-color="#ffc069"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f9a8d4"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <linearGradient id="balanceFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="bgBlobBlue" cx="20%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.16"/><stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPurple" cx="100%" cy="10%" r="55%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.14"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobGreen" cx="50%" cy="115%" r="55%">
+      <stop offset="0%" stop-color="#12b76a" stop-opacity="0.12"/><stop offset="100%" stop-color="#12b76a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPink" cx="90%" cy="95%" r="45%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.10"/><stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#14213c" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .f { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .disp { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+
+  <rect width="380" height="780" fill="#eef1f8"/>
+  <rect width="380" height="780" fill="url(#bgBlobBlue)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPurple)"/>
+  <rect width="380" height="780" fill="url(#bgBlobGreen)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPink)"/>
+
+
+  <rect x="0" y="0" width="380" height="780" rx="30" fill="#ffffff" stroke="#e2e6f0" stroke-width="2"/>
+
+<text x="24" y="40" class="disp" font-size="18" fill="#101423">Analytics</text>
+<text x="24" y="58" class="f" font-size="11" fill="#a4abbd">Last 30 days · 42 trades</text>
+<rect x="24" y="76" width="332" height="150" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="42" y="102" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">EQUITY CURVE</text>
+<path d="M 42,116 L 66,126 L 90,122 L 114,141 L 138,136 L 162,156 L 186,150 L 210,170 L 234,162 L 258,178 L 282,172 L 306,188 L 330,182 L 330,206 L 42,206 Z" fill="url(#balanceFill)"/>
+<path d="M 42,116 L 66,126 L 90,122 L 114,141 L 138,136 L 162,156 L 186,150 L 210,170 L 234,162 L 258,178 L 282,172 L 306,188 L 330,182" fill="none" stroke="#2f6bff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="24" y="244" width="332" height="268" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="42" y="272" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">TRADING CALENDAR</text>
+<text x="314" y="272" text-anchor="end" class="disp" font-size="12.5" fill="#101423">May 2026</text>
+<text x="62.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">S</text>
+<text x="102.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">M</text>
+<text x="142.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">T</text>
+<text x="182.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">W</text>
+<text x="222.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">T</text>
+<text x="262.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">F</text>
+<text x="302.0" y="290" text-anchor="middle" class="f" font-size="9.5" fill="#a4abbd">S</text>
+<text x="262.0" y="328" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">1</text>
+<rect x="286.0" y="310" width="32" height="28" rx="8" fill="rgba(18,183,106,0.45)"/>
+<text x="302.0" y="328" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f">2</text>
+<rect x="46.0" y="348" width="32" height="28" rx="8" fill="rgba(18,183,106,0.63)"/>
+<text x="62.0" y="366" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">3</text>
+<text x="102.0" y="366" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">4</text>
+<text x="142.0" y="366" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">5</text>
+<rect x="166.0" y="348" width="32" height="28" rx="8" fill="rgba(229,72,77,0.37)"/>
+<text x="182.0" y="366" text-anchor="middle" font-size="10.5" fill="#8a1c1f" class="f">6</text>
+<text x="222.0" y="366" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">7</text>
+<rect x="246.0" y="348" width="32" height="28" rx="8" fill="rgba(229,72,77,0.52)"/>
+<text x="262.0" y="366" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">8</text>
+<rect x="286.0" y="348" width="32" height="28" rx="8" fill="rgba(229,72,77,0.52)"/>
+<text x="302.0" y="366" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">9</text>
+<rect x="46.0" y="386" width="32" height="28" rx="8" fill="rgba(18,183,106,0.29)"/>
+<text x="62.0" y="404" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f">10</text>
+<rect x="86.0" y="386" width="32" height="28" rx="8" fill="rgba(18,183,106,0.80)"/>
+<text x="102.0" y="404" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">11</text>
+<rect x="126.0" y="386" width="32" height="28" rx="8" fill="rgba(18,183,106,0.71)"/>
+<text x="142.0" y="404" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">12</text>
+<rect x="166.0" y="386" width="32" height="28" rx="8" fill="rgba(18,183,106,0.23)"/>
+<text x="182.0" y="404" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f">13</text>
+<rect x="206.0" y="386" width="32" height="28" rx="8" fill="rgba(229,72,77,0.61)"/>
+<text x="222.0" y="404" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">14</text>
+<text x="262.0" y="404" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">15</text>
+<text x="302.0" y="404" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">16</text>
+<rect x="46.0" y="424" width="32" height="28" rx="8" fill="rgba(229,72,77,0.52)"/>
+<text x="62.0" y="442" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">17</text>
+<rect x="86.0" y="424" width="32" height="28" rx="8" fill="rgba(229,72,77,0.81)"/>
+<text x="102.0" y="442" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">18</text>
+<rect x="126.0" y="424" width="32" height="28" rx="8" fill="rgba(229,72,77,0.84)"/>
+<text x="142.0" y="442" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">19</text>
+<rect x="166.0" y="424" width="32" height="28" rx="8" fill="rgba(18,183,106,0.76)"/>
+<text x="182.0" y="442" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">20</text>
+<rect x="206.0" y="424" width="32" height="28" rx="8" fill="rgba(18,183,106,0.85)"/>
+<text x="222.0" y="442" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">21</text>
+<rect x="246.0" y="424" width="32" height="28" rx="8" fill="rgba(229,72,77,0.25)"/>
+<text x="262.0" y="442" text-anchor="middle" font-size="10.5" fill="#8a1c1f" class="f">22</text>
+<text x="302.0" y="442" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">23</text>
+<text x="62.0" y="480" text-anchor="middle" font-size="10.5" fill="#a4abbd" class="f">24</text>
+<rect x="86.0" y="462" width="32" height="28" rx="8" fill="rgba(229,72,77,0.49)"/>
+<text x="102.0" y="480" text-anchor="middle" font-size="10.5" fill="#8a1c1f" class="f">25</text>
+<rect x="126.0" y="462" width="32" height="28" rx="8" fill="rgba(18,183,106,0.40)"/>
+<text x="142.0" y="480" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f">26</text>
+<rect x="166.0" y="462" width="32" height="28" rx="8" fill="rgba(18,183,106,0.46)"/>
+<text x="182.0" y="480" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f">27</text>
+<rect x="206.0" y="462" width="32" height="28" rx="8" fill="rgba(18,183,106,0.60)"/>
+<text x="222.0" y="480" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">28</text>
+<rect x="246.0" y="462" width="32" height="28" rx="8" fill="rgba(18,183,106,0.83)"/>
+<text x="262.0" y="480" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">29</text>
+<rect x="286.0" y="462" width="32" height="28" rx="8" fill="rgba(18,183,106,0.85)"/>
+<text x="302.0" y="480" text-anchor="middle" font-size="10.5" fill="#ffffff" class="f">30</text>
+<rect x="24" y="528" width="332" height="150" rx="18" fill="#ffffff" stroke="#e8ebf3" filter="url(#softShadow)"/>
+<text x="42" y="554" class="f" font-size="11" fill="#a4abbd" letter-spacing="0.5">BEST / WORST WEEKDAY</text>
+<rect x="42" y="604.0" width="26" height="34.0" rx="6" fill="#12b76a" opacity="0.88"/>
+<text x="55" y="656" text-anchor="middle" font-size="9.5" fill="#767e93" class="f">Mon</text>
+<rect x="94" y="638" width="26" height="12.0" rx="6" fill="#e5484d" opacity="0.88"/>
+<text x="107" y="666.0" text-anchor="middle" font-size="9.5" fill="#767e93" class="f">Tue</text>
+<rect x="146" y="590.0" width="26" height="48.0" rx="6" fill="#12b76a" opacity="0.88"/>
+<text x="159" y="656" text-anchor="middle" font-size="9.5" fill="#767e93" class="f">Wed</text>
+<rect x="198" y="616.0" width="26" height="22.0" rx="6" fill="#12b76a" opacity="0.88"/>
+<text x="211" y="656" text-anchor="middle" font-size="9.5" fill="#767e93" class="f">Thu</text>
+<rect x="250" y="638" width="26" height="28.0" rx="6" fill="#e5484d" opacity="0.88"/>
+<text x="263" y="682.0" text-anchor="middle" font-size="9.5" fill="#767e93" class="f">Fri</text>
+<line x1="42" y1="638" x2="356" y2="638" stroke="#e8ebf3"/>
+<rect x="0" y="710" width="380" height="70" fill="#ffffff" stroke="#e8ebf3"/>
+<circle cx="38" cy="734" r="4" fill="#a4abbd"/>
+<text x="38" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Home</text>
+<circle cx="114" cy="734" r="4" fill="#a4abbd"/>
+<text x="114" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Trades</text>
+<circle cx="190" cy="740" r="24" fill="url(#blueGrad)"/>
+<text x="190" y="747" text-anchor="middle" fill="#fff" font-size="22" class="disp">+</text>
+<circle cx="266" cy="734" r="4" fill="#2f6bff"/>
+<text x="266" y="758" text-anchor="middle" class="f" font-size="9" fill="#2f6bff">Analytics</text>
+<circle cx="342" cy="734" r="4" fill="#a4abbd"/>
+<text x="342" y="758" text-anchor="middle" class="f" font-size="9" fill="#a4abbd">Settings</text>
+</svg>

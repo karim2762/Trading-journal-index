@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 780" width="380" height="780">
+
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff"/><stop offset="100%" stop-color="#5b93ff"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12b76a"/><stop offset="100%" stop-color="#5fe3a1"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f79009"/><stop offset="100%" stop-color="#ffc069"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f9a8d4"/>
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <linearGradient id="balanceFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="bgBlobBlue" cx="20%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#2f6bff" stop-opacity="0.16"/><stop offset="100%" stop-color="#2f6bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPurple" cx="100%" cy="10%" r="55%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.14"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobGreen" cx="50%" cy="115%" r="55%">
+      <stop offset="0%" stop-color="#12b76a" stop-opacity="0.12"/><stop offset="100%" stop-color="#12b76a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgBlobPink" cx="90%" cy="95%" r="45%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.10"/><stop offset="100%" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#14213c" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .f { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .disp { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+
+  <rect width="380" height="780" fill="#eef1f8"/>
+  <rect width="380" height="780" fill="url(#bgBlobBlue)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPurple)"/>
+  <rect width="380" height="780" fill="url(#bgBlobGreen)"/>
+  <rect width="380" height="780" fill="url(#bgBlobPink)"/>
+
+
+  <rect x="0" y="0" width="380" height="780" rx="30" fill="#ffffff" stroke="#e2e6f0" stroke-width="2"/>
+
+<rect x="0" y="0" width="380" height="56" fill="#ffffff" stroke="#e8ebf3"/>
+<text x="24" y="34" class="disp" font-size="16" fill="#101423">Log a Trade</text>
+<circle cx="350" cy="28" r="14" fill="#f3f5fb"/>
+<line x1="344" y1="22" x2="356" y2="34" stroke="#767e93" stroke-width="1.6"/>
+<line x1="356" y1="22" x2="344" y2="34" stroke="#767e93" stroke-width="1.6"/>
+<rect x="24" y="74" width="332" height="86" rx="16" fill="rgba(47,107,255,.06)" stroke="#2f6bff" stroke-width="1.4" stroke-dasharray="6 6"/>
+<circle cx="66" cy="117" r="18" fill="url(#blueGrad)"/>
+<text x="66" y="123" text-anchor="middle" fill="#fff" font-size="16" class="disp">✦</text>
+<text x="96" y="112" class="f" font-size="12.5" fill="#101423" font-weight="700">Tap or drop calculator screenshot</text>
+<text x="96" y="130" class="f" font-size="10.5" fill="#a4abbd">Entry / SL / TP auto-fills the form below</text>
+<text x="24" y="178" class="f" font-size="10.5" fill="#767e93" font-weight="600">SYMBOL</text>
+<rect x="24" y="186" width="332" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="211" class="f" font-size="13.5" fill="#101423">EURUSD</text>
+<text x="24" y="240" class="f" font-size="10.5" fill="#767e93" font-weight="600">DATE</text>
+<rect x="24" y="248" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="273" class="f" font-size="13.5" fill="#101423">2026-05-14</text>
+<text x="198" y="240" class="f" font-size="10.5" fill="#767e93" font-weight="600">TIME</text>
+<rect x="198" y="248" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="212" y="273" class="f" font-size="13.5" fill="#101423">09:32</text>
+<text x="24" y="302" class="f" font-size="10.5" fill="#767e93" font-weight="600">LOT SIZE</text>
+<rect x="24" y="310" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="335" class="f" font-size="13.5" fill="#101423">1.00</text>
+<text x="198" y="302" class="f" font-size="10.5" fill="#767e93" font-weight="600">ENTRY PRICE</text>
+<rect x="198" y="310" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="212" y="335" class="f" font-size="13.5" fill="#101423">1.08420</text>
+<text x="24" y="364" class="f" font-size="10.5" fill="#767e93" font-weight="600">STOP LOSS</text>
+<rect x="24" y="372" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="397" class="f" font-size="13.5" fill="#101423">1.08120</text>
+<text x="198" y="364" class="f" font-size="10.5" fill="#767e93" font-weight="600">TAKE PROFIT</text>
+<rect x="198" y="372" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="212" y="397" class="f" font-size="13.5" fill="#101423">1.09120</text>
+<text x="24" y="426" class="f" font-size="10.5" fill="#767e93" font-weight="600">EXIT PRICE</text>
+<rect x="24" y="434" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="459" class="f" font-size="13.5" fill="#12b76a">1.09080</text>
+<rect x="140" y="426" width="34" height="15" rx="7" fill="rgba(47,107,255,.14)"/>
+<text x="157" y="437" text-anchor="middle" font-size="8.5" fill="#2f6bff" class="f" font-weight="700">auto</text>
+<text x="198" y="426" class="f" font-size="10.5" fill="#767e93" font-weight="600">P&amp;L</text>
+<rect x="198" y="434" width="158" height="40" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="212" y="459" class="f" font-size="13.5" fill="#12b76a">+$660.00</text>
+<text x="24" y="488" class="f" font-size="10.5" fill="#767e93" font-weight="600">TAGS</text>
+<rect x="24" y="496" width="98.6" height="26" rx="13" fill="rgba(47,107,255,0.14)" stroke="rgba(47,107,255,0.35)"/>
+<text x="73.3" y="513" text-anchor="middle" font-size="10.5" fill="#1d4fd6" class="f" font-weight="700">London Open</text>
+<rect x="130.6" y="496" width="78.8" height="26" rx="13" fill="rgba(139,92,246,0.14)" stroke="rgba(139,92,246,0.35)"/>
+<text x="170.0" y="513" text-anchor="middle" font-size="10.5" fill="#6d28d9" class="f" font-weight="700">Breakout</text>
+<rect x="217.39999999999998" y="496" width="78.8" height="26" rx="13" fill="rgba(18,183,106,0.14)" stroke="rgba(18,183,106,0.35)"/>
+<text x="256.79999999999995" y="513" text-anchor="middle" font-size="10.5" fill="#0a7a4a" class="f" font-weight="700">A+ Setup</text>
+<text x="24" y="538" class="f" font-size="10.5" fill="#767e93" font-weight="600">NOTES</text>
+<rect x="24" y="546" width="332" height="58" rx="12" fill="#ffffff" stroke="#e3e7f0"/>
+<text x="38" y="568" class="f" font-size="11.5" fill="#a4abbd">Clean break of London range, retested</text>
+<text x="38" y="584" class="f" font-size="11.5" fill="#a4abbd">the level and held. Followed my plan.</text>
+<rect x="24" y="690" width="110" height="46" rx="14" fill="#f3f5fb" stroke="#e8ebf3"/>
+<text x="79" y="719" text-anchor="middle" class="f" font-size="13" fill="#767e93" font-weight="700">Cancel</text>
+<rect x="146" y="690" width="210" height="46" rx="14" fill="url(#blueGrad)"/>
+<text x="251" y="719" text-anchor="middle" fill="#fff" font-size="13" class="f" font-weight="700">Save Trade</text>
+</svg>
