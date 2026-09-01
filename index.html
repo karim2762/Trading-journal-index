@@ -3357,15 +3357,42 @@ async function syncGenerateCode(){
       conn.on('open', ()=>{
         conn.send(json);
         if(statusEl) statusEl.textContent = 'Connected — sending…';
-        setTimeout(()=>{
-          if(settled) return;
+      });
+      // Wait for the receiver to actually confirm it imported the data —
+      // sending over the data channel does not mean the other side
+      // received, parsed, and applied it (especially with image-heavy
+      // payloads), so success must be reported by the receiver, not assumed.
+      conn.on('data', (msg)=>{
+        if(settled) return;
+        if(msg === 'SYNC_ACK'){
           settled = true;
           toast('Synced successfully');
           clearTimeout(expiryTimer);
           conn.close();
           syncCleanupSender();
           closeSheet();
-        }, 900);
+        }else if(msg === 'SYNC_DECLINED'){
+          settled = true;
+          if(statusEl) statusEl.textContent = 'The other device declined the import.';
+          toast('Sync cancelled on the other device');
+          clearTimeout(expiryTimer);
+          conn.close();
+          syncCleanupSender();
+        }else if(msg === 'SYNC_FAILED'){
+          settled = true;
+          if(statusEl) statusEl.textContent = 'The other device could not apply the data.';
+          toast('Sync failed on the other device — try Export/Import instead');
+          clearTimeout(expiryTimer);
+          conn.close();
+          syncCleanupSender();
+        }
+      });
+      conn.on('close', ()=>{
+        if(settled) return;
+        settled = true;
+        toast('Connection closed before the other device confirmed — check it before assuming it worked');
+        clearTimeout(expiryTimer);
+        syncCleanupSender();
       });
     });
     peer.on('error', (err)=>{
@@ -3422,7 +3449,9 @@ async function syncRedeemCode(){
           const data = JSON.parse(json);
           if(!data.profile || !Array.isArray(data.trades)) throw new Error('That code sent invalid data');
           if(!confirm(`Import ${data.trades.length} trades and overwrite the data on this device?`)){
-            finish(); try{ peer.destroy(); }catch{}
+            try{ conn.send('SYNC_DECLINED'); }catch{}
+            setTimeout(()=>{ try{ conn.close(); peer.destroy(); }catch{} }, 500);
+            finish();
             return;
           }
           await dbClearAll();
@@ -3432,9 +3461,16 @@ async function syncRedeemCode(){
           for(const w of (data.widgets||[])) await dbPut('widgets', w);
           input.value = '';
           toast('Synced successfully');
-          try{ conn.close(); peer.destroy(); }catch{}
-          setTimeout(()=>location.reload(), 700);
+          // Tell the sending device it actually landed — give the ack a
+          // moment to flush over the data channel before tearing it down.
+          try{ conn.send('SYNC_ACK'); }catch{}
+          setTimeout(()=>{
+            try{ conn.close(); peer.destroy(); }catch{}
+            location.reload();
+          }, 700);
         }catch(err){
+          try{ conn.send('SYNC_FAILED'); }catch{}
+          setTimeout(()=>{ try{ conn.close(); peer.destroy(); }catch{} }, 500);
           toast('Sync failed: '+err.message+' — try Export/Import instead');
           finish(); try{ peer.destroy(); }catch{}
         }
