@@ -3181,6 +3181,19 @@ async function importData(e){
    dependency to fail. The "code" is just the ID one browser listens on; the
    other browser dials it directly. Both devices need to be online for the
    few seconds the transfer takes — after that, the code is gone. */
+const SYNC_ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  // Mobile-data connections sit behind carrier-grade NAT, where a direct
+  // STUN-only path often can't be established — that's why sync can work
+  // once and then fail on a later attempt depending on network conditions.
+  // These public TURN relays give WebRTC a fallback path when a direct
+  // connection isn't possible.
+  { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+];
+const SYNC_PEER_OPTS = { config: { iceServers: SYNC_ICE_SERVERS } };
 const SYNC_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid mix-ups
 const SYNC_ID_PREFIX = 'tj9-';
 let PEERJS_LOAD_PROMISE = null;
@@ -3310,7 +3323,7 @@ async function syncGenerateCode(){
       return;
     }
     const code = syncGenCode();
-    const peer = new Peer(SYNC_ID_PREFIX + code.toLowerCase());
+    const peer = new Peer(SYNC_ID_PREFIX + code.toLowerCase(), SYNC_PEER_OPTS);
     syncSenderPeer = peer;
     let settled = false;
     let expiryTimer = null;
@@ -3390,14 +3403,14 @@ async function syncRedeemCode(){
   const finish = ()=>{ btn.textContent = origLabel; btn.disabled = false; };
   try{
     await loadPeerJS();
-    peer = new Peer();
+    peer = new Peer(undefined, SYNC_PEER_OPTS);
     const timeout = setTimeout(()=>{
       if(settled) return;
       settled = true;
       toast('Could not find that device — make sure the code is current and both devices are online');
       try{ peer.destroy(); }catch{}
       finish();
-    }, 20000);
+    }, 30000);
 
     peer.on('open', ()=>{
       const conn = peer.connect(SYNC_ID_PREFIX + code.toLowerCase(), {reliable:true});
