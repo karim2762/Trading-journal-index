@@ -129,13 +129,6 @@ input,select,textarea{font-family:inherit;}
   background:var(--blue-dim);border:1px solid rgba(47,107,255,.18);font-size:11.5px;line-height:1.5;color:var(--blue2);}
 .onboard-privacy svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
 
-/* Desktop-only chart/branding panel — hidden by default so it doesn't
-   duplicate the mobile header + stack above the form on small screens.
-   Re-enabled (display:flex) inside the min-width:900px split-layout query. */
-.splash-visual{display:none;}
-.splash{padding:24px 16px;}
-.splash-inner{gap:22px;}
-
 /* Welcome heading above the form — desktop only, the mobile header above
    already carries the same "here's what this is" copy. */
 .splash-form-head{display:none;}
@@ -150,6 +143,7 @@ input,select,textarea{font-family:inherit;}
 .splash-mobile-contact a:hover{color:var(--blue2);}
 .splash-mobile-contact a svg{width:14px;height:14px;}
 
+.splash-visual{display:none;}
 @media(min-width:900px){
   .splash-mobile-header,.splash-mobile-contact{display:none;}
   .splash-inner{flex-direction:row;align-items:stretch;gap:0;background:var(--card);
@@ -2044,7 +2038,7 @@ function renderLogTrade(){
             <span class="fli fli-pnl ${parseFloat(d.pnl)<0?'neg':''}">${svgIcon('dollar')}</span>P&L Amount ($)
             ${(!d.pnlManual && d.pnl!=='' && d.status!=='open') ? `<span class="auto-badge" id="pnl-auto-badge">auto</span>` : ''}
           </div>
-          <input class="input" type="number" step="any" id="f-pnl" placeholder="Leave blank to auto-calc" value="${d.pnl}" ${d.status==='open'?'disabled':''}>
+          <input class="input" type="number" step="any" id="f-pnl" placeholder="e.g +150$" value="${d.pnl}" ${d.status==='open'?'disabled':''}>
           <span class="field-hint ${d.status==='win'?'is-win':d.status==='loss'?'is-loss':''}">${d.status==='loss'?'Saved as a loss':d.status==='win'?'Saved as a win':'\u00A0'}</span>
         </div>
         <div>
