@@ -2685,18 +2685,18 @@ function renderSettings(){
 
     <div class="section-head" style="margin-left:2px;margin-right:2px;"><div class="section-title"><span class="dot"></span>Sync between devices</div></div>
     <div class="card">
-      <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.5;">No file needed — generate a code on this device, then enter it on the other one to bring everything across.</p>
+      <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.5;">No file, no account — generate a code on this device, then enter it on the other one to bring everything across.</p>
       <div class="set-row" style="align-items:flex-start;">
         <div class="l"><b>Send from this device</b><small>Creates a one-time code with your data</small></div>
         <button class="btn btn-ghost btn-sm" id="btn-sync-generate">${svgIcon('sync')} Get code</button>
       </div>
       <div style="height:1px;background:var(--border);margin:14px 0;"></div>
       <div class="field-label" style="margin-top:0;">Receive on this device</div>
-      <div style="display:flex;gap:8px;">
-        <input class="input" id="sync-code-input" placeholder="Enter code" style="flex:1;text-transform:uppercase;letter-spacing:2px;" maxlength="6">
-        <button class="btn btn-primary" id="btn-sync-redeem" style="white-space:nowrap;">Sync</button>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input class="input" id="sync-code-input" placeholder="Enter code" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;box-sizing:border-box;text-align:center;font-family:'Space Grotesk',monospace;font-size:24px;font-weight:700;letter-spacing:3px;padding:16px 10px;height:auto;">
+        <button class="btn btn-primary btn-block" id="btn-sync-redeem">Sync</button>
       </div>
-      <div style="font-size:11px;color:var(--text-dim2);margin-top:10px;line-height:1.5;">Codes are short-lived and single-use. Receiving overwrites the data currently on this device.</div>
+      <div style="font-size:11px;color:var(--text-dim2);margin-top:10px;line-height:1.5;">Codes are single-use and work over the internet — no sign-in required. Receiving overwrites the data currently on this device.</div>
     </div>
 
     <div class="section-head" style="margin-left:2px;margin-right:2px;"><div class="section-title"><span class="dot"></span>Reports</div></div>
@@ -2742,7 +2742,12 @@ function bindSettings(){
   $('#btn-export-pdf').addEventListener('click', exportPDF);
   $('#btn-sync-generate').addEventListener('click', syncGenerateCode);
   $('#btn-sync-redeem').addEventListener('click', syncRedeemCode);
-  $('#sync-code-input').addEventListener('input', (e)=>{ e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
+  $('#sync-code-input').addEventListener('input', (e)=>{ e.target.value = syncCleanCodeInput(e.target.value); });
+  $('#sync-code-input').addEventListener('paste', (e)=>{
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text');
+    e.target.value = syncCleanCodeInput(text);
+  });
   $('#sync-code-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter') syncRedeemCode(); });
   $('#btn-reset-widgets').addEventListener('click', async ()=>{
     if(!confirm('Reset dashboard to default widgets?')) return;
@@ -3169,21 +3174,22 @@ async function importData(e){
   }
 }
 
-/* ---------------- Sync via code (no file, cross-device) ---------------- */
-const SYNC_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid mix-ups
-function syncGenCode(){
-  let c = '';
-  for(let i=0;i<6;i++) c += SYNC_CODE_CHARS[Math.floor(Math.random()*SYNC_CODE_CHARS.length)];
-  return c;
+/* ---------------- Sync via code (no file, cross-device, no sign-in) ----------------
+   Uses jsonblob.com — a free, anonymous JSON storage API that needs no account,
+   no API key, and works from any browser (unlike window.storage, which only
+   exists when this app is embedded inside Claude). A blob is created holding
+   your data; its ID is shown as the "code"; the other device fetches that blob
+   by ID, imports it, then the blob is deleted so the code can't be reused. */
+const JSONBLOB_API = 'https://jsonblob.com/api/jsonBlob';
+
+function syncFormatCodeForDisplay(code){
+  return code.replace(/(.{4})/g, '$1 ').trim();
 }
-function syncStorageAvailable(){
-  return typeof window.storage !== 'undefined' && window.storage && typeof window.storage.set === 'function';
+function syncCleanCodeInput(raw){
+  return raw.replace(/\s+/g,'').replace(/[^0-9A-Za-z]/g,'');
 }
+
 async function syncGenerateCode(){
-  if(!syncStorageAvailable()){
-    toast('Sync codes need this journal open in Claude');
-    return;
-  }
   const btn = $('#btn-sync-generate');
   const origLabel = btn.innerHTML;
   btn.innerHTML = 'Generating…'; btn.disabled = true;
@@ -3194,16 +3200,22 @@ async function syncGenerateCode(){
       toast('Data too large to sync by code — use Export/Import file instead');
       return;
     }
-    const code = syncGenCode();
-    const result = await window.storage.set('sync:'+code, json, true);
-    if(!result) throw new Error('Could not create code, try again');
+    const res = await fetch(JSONBLOB_API, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Accept':'application/json'},
+      body: json
+    });
+    if(!res.ok) throw new Error('Server said no (HTTP '+res.status+')');
+    const location = res.headers.get('Location') || res.headers.get('location');
+    if(!location) throw new Error('Could not get a code back, try again');
+    const code = location.split('/').pop();
     openSheet(`
       <div class="sheet-handle"></div>
       <div class="sheet-title">Sync code <button class="sheet-close" id="sheet-close">${svgIcon('close')}</button></div>
       <div style="padding:4px 4px 6px;">
-        <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 18px;line-height:1.5;">Enter this code in <b>Settings → Receive on this device</b> on your other device.</p>
+        <p style="font-size:12.5px;color:var(--text-dim);margin:0 0 18px;line-height:1.5;">Enter this code in <b>Settings → Receive on this device</b> on your other device. No account needed — it works over the internet.</p>
         <div style="display:flex;justify-content:center;">
-          <div id="sync-code-display" style="font-family:'Space Grotesk';font-size:38px;font-weight:700;letter-spacing:8px;background:var(--card-2,rgba(127,127,127,.08));border:1px solid var(--border);border-radius:14px;padding:18px 10px;text-align:center;width:100%;max-width:320px;">${code}</div>
+          <div id="sync-code-display" style="font-family:'Space Grotesk';font-size:26px;font-weight:700;letter-spacing:3px;background:var(--card-2,rgba(127,127,127,.08));border:1px solid var(--border);border-radius:14px;padding:20px 12px;text-align:center;width:100%;max-width:340px;word-break:break-all;line-height:1.4;">${syncFormatCodeForDisplay(code)}</div>
         </div>
         <button class="btn btn-ghost btn-block" id="btn-sync-copy" style="margin-top:14px;">${svgIcon('copy')} Copy code</button>
         <div style="font-size:11px;color:var(--text-dim2);margin-top:14px;line-height:1.5;text-align:center;">Includes your profile, trades, and dashboard layout. The code is consumed the moment it's used on the other device.</div>
@@ -3216,28 +3228,26 @@ async function syncGenerateCode(){
       catch{ toast('Could not copy — select it manually'); }
     });
   }catch(err){
-    toast('Could not generate code: '+err.message);
+    toast('Could not generate code: '+err.message+' — try Export/Import instead');
   }finally{
     btn.innerHTML = origLabel; btn.disabled = false;
   }
 }
+
 async function syncRedeemCode(){
-  if(!syncStorageAvailable()){
-    toast('Sync codes need this journal open in Claude');
-    return;
-  }
   const input = $('#sync-code-input');
-  const code = input.value.trim().toUpperCase();
-  if(code.length < 4){ toast('Enter the code from your other device'); return; }
+  const code = syncCleanCodeInput(input.value);
+  if(code.length < 6){ toast('Enter the code from your other device'); return; }
   const btn = $('#btn-sync-redeem');
   const origLabel = btn.textContent;
   btn.textContent = 'Syncing…'; btn.disabled = true;
   try{
-    let record;
-    try{ record = await window.storage.get('sync:'+code, true); }
-    catch{ record = null; }
-    if(!record || !record.value){ toast('Code not found or already used'); return; }
-    const data = JSON.parse(record.value);
+    const res = await fetch(JSONBLOB_API+'/'+encodeURIComponent(code), {
+      headers: {'Accept':'application/json'}
+    });
+    if(res.status === 404){ toast('Code not found or already used'); return; }
+    if(!res.ok) throw new Error('Server said no (HTTP '+res.status+')');
+    const data = await res.json();
     if(!data.profile || !Array.isArray(data.trades)) throw new Error('That code has invalid data');
     if(!confirm(`Import ${data.trades.length} trades and overwrite the data on this device?`)) return;
     await dbClearAll();
@@ -3245,11 +3255,12 @@ async function syncRedeemCode(){
     await dbPut('settings', data.settings || {id:1, backendUrl:'', currency:'USD'});
     for(const t of data.trades) await dbPut('trades', t);
     for(const w of (data.widgets||[])) await dbPut('widgets', w);
-    try{ await window.storage.delete('sync:'+code, true); }catch{}
+    try{ await fetch(JSONBLOB_API+'/'+encodeURIComponent(code), {method:'DELETE'}); }catch{}
+    input.value = '';
     toast('Synced successfully');
     setTimeout(()=>location.reload(), 700);
   }catch(err){
-    toast('Sync failed: '+err.message);
+    toast('Sync failed: '+err.message+' — try Export/Import instead');
   }finally{
     btn.textContent = origLabel; btn.disabled = false;
   }
