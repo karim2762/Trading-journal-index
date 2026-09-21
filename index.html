@@ -100,99 +100,344 @@ input,select,textarea{font-family:inherit;}
 }
 @keyframes appIn{from{opacity:0;transform:translateY(14px) scale(.99);}to{opacity:1;transform:none;}}
 
-/* ---------- Splash / onboarding ---------- */
-.splash{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+/* ---------- Onboarding ---------- *
+   Self-contained dark surface. All rules are namespaced under .ob (or
+   body.onboarding) so the redesigned setup screen keeps its own palette
+   regardless of which app theme is active afterwards. */
+
+body.onboarding{padding:0;background:#070a14;animation:none;overflow-x:hidden;}
+body.onboarding #app{max-width:none;width:100%;margin:0;min-height:100dvh;background:none;
+  border:none;border-radius:0;box-shadow:none;overflow:visible;animation:none;}
+
+.ob{
+  --ob-ink:#eef1fb;
+  --ob-dim:#98a2bf;
+  --ob-dim2:#69739a;
+  --ob-line:rgba(255,255,255,.09);
+  --ob-line2:rgba(255,255,255,.17);
+  --ob-accent:#5b8cff;
+  --ob-accent2:#a074ff;
+  --ob-up:#2fd39a;
+  --ob-down:#ff6b72;
+  min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  padding:clamp(12px,3.2vw,40px);
+  padding-bottom:calc(clamp(12px,3.2vw,40px) + env(safe-area-inset-bottom) + var(--kb-offset));
+  color:var(--ob-ink);font-family:'Inter',system-ui,sans-serif;
+  background:
+    radial-gradient(900px 620px at 6% -10%, rgba(91,140,255,.20), transparent 62%),
+    radial-gradient(760px 600px at 104% 2%, rgba(160,116,255,.17), transparent 60%),
+    radial-gradient(760px 520px at 52% 118%, rgba(47,211,154,.09), transparent 62%),
+    #070a14;
 }
-.splash-inner{width:100%;max-width:1040px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+.ob *{box-sizing:border-box;}
+.ob-shell{
+  width:min(1060px,100%);display:grid;grid-template-columns:1fr;
+  border-radius:26px;overflow:hidden;border:1px solid var(--ob-line);
+  background:linear-gradient(180deg,rgba(22,28,48,.92) 0%,rgba(12,16,30,.96) 100%);
+  box-shadow:0 50px 120px -50px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.05);
+  animation:obIn .5s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes obIn{from{opacity:0;transform:translateY(16px) scale(.99);}to{opacity:1;transform:none;}}
 
-/* Mobile/compact brand header — hidden once the split desktop layout
-   (with its own branding inside .splash-visual) takes over. */
-.splash-mobile-header{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;}
-.splash-logo-wrap{width:88px;height:88px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 24px -8px rgba(47,107,255,.28);border:1px solid var(--card-border);overflow:hidden;flex-shrink:0;}
-.splash-logo{width:56px;height:56px;object-fit:contain;border-radius:50%;}
-.brandmark{font-family:'Space Grotesk';font-weight:700;font-size:24px;letter-spacing:.2px;color:var(--text);}
-.brand-sub{color:var(--text-dim);font-size:13.5px;max-width:280px;line-height:1.5;}
+/* ---- Mobile hero banner (collapsed version of the desktop art) ---- */
+.ob-hero{position:relative;display:flex;align-items:center;gap:12px;padding:15px 17px;overflow:hidden;
+  border-bottom:1px solid var(--ob-line);
+  background:linear-gradient(120deg,rgba(91,140,255,.28) 0%,rgba(160,116,255,.20) 58%,rgba(47,211,154,.12) 100%);}
+.ob-hero-logo{width:42px;height:42px;border-radius:14px;background:#fff;display:grid;place-items:center;
+  flex-shrink:0;overflow:hidden;box-shadow:0 10px 22px -12px rgba(0,0,0,.9);}
+.ob-hero-logo img{width:28px;height:28px;object-fit:contain;border-radius:9px;}
+.ob-hero-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.1px;}
+.ob-hero-sub{font-size:11.5px;color:rgba(238,241,251,.66);margin-top:2px;}
+.ob-hero-art{position:absolute;right:-14px;bottom:-10px;width:112px;opacity:.32;pointer-events:none;}
 
-.onboard-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--card-border);
-  border-radius:var(--radius);padding:26px 22px;box-shadow:var(--shadow);text-align:left;
-  position:relative;overflow:hidden;}
-.onboard-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue-grad);}
-.field-label{font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px;}
-.field-label:first-child{margin-top:0;}
-.onboard-card .field-label-row{margin:18px 0 8px;font-size:12px;font-weight:700;color:var(--text-dim);
-  text-transform:uppercase;letter-spacing:.5px;}
-.onboard-card .field-label-row:first-child{margin-top:0;}
-.onboard-card #ob-submit{margin-top:22px;}
-.onboard-privacy{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:12px;
-  background:var(--blue-dim);border:1px solid rgba(47,107,255,.18);font-size:11.5px;line-height:1.5;color:var(--blue2);}
-.onboard-privacy svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
+/* ---- Right column: the guided form ---- */
+.ob-main{padding:clamp(20px,5vw,32px);display:flex;flex-direction:column;}
+.ob-kicker{font-size:12px;font-weight:600;color:var(--ob-accent);letter-spacing:.01em;}
+.ob-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,5.4vw,28px);
+  letter-spacing:-.4px;margin-top:5px;line-height:1.2;}
+.ob-lede{font-size:13.5px;line-height:1.6;color:var(--ob-dim);margin-top:8px;max-width:46ch;}
 
-/* Welcome heading above the form — desktop only, the mobile header above
-   already carries the same "here's what this is" copy. */
-.splash-form-head{display:none;}
+.ob-progress{margin:22px 0 24px;}
+.ob-track{height:4px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;}
+.ob-fill{height:100%;border-radius:99px;width:33.333%;
+  background:linear-gradient(90deg,var(--ob-accent),var(--ob-accent2));
+  box-shadow:0 0 16px rgba(91,140,255,.55);transition:width .45s cubic-bezier(.2,.8,.2,1);}
+.ob-crumbs{display:flex;gap:16px;margin-top:11px;}
+.ob-crumb{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;
+  color:var(--ob-dim2);transition:color .25s;}
+.ob-crumb .ob-num{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+  font-size:10.5px;font-weight:700;border:1px solid var(--ob-line2);color:var(--ob-dim2);transition:.25s;}
+.ob-crumb.is-active{color:var(--ob-ink);}
+.ob-crumb.is-active .ob-num{color:#fff;border-color:transparent;
+  background:linear-gradient(135deg,var(--ob-accent),var(--ob-accent2));box-shadow:0 0 0 4px rgba(91,140,255,.15);}
+.ob-crumb.is-done{color:var(--ob-up);}
+.ob-crumb.is-done .ob-num{color:var(--ob-up);border-color:rgba(47,211,154,.45);background:rgba(47,211,154,.12);}
+.ob-crumb.is-done .ob-num svg{width:11px;height:11px;}
 
-/* Compact "made by" strip, always visible under the form on mobile. On
-   desktop the same info lives inside the left visual panel instead, so
-   this copy is hidden there to avoid repeating it twice. */
-.splash-mobile-contact{width:100%;max-width:380px;text-align:center;font-size:12px;color:var(--text-dim2);
-  display:flex;flex-direction:column;align-items:center;gap:8px;}
-.splash-mobile-contact .smc-links{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
-.splash-mobile-contact a{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--text-dim);}
-.splash-mobile-contact a:hover{color:var(--blue2);}
-.splash-mobile-contact a svg{width:14px;height:14px;}
+.ob-panes{flex:1;}
+.ob-pane{display:none;}
+.ob-pane.is-active{display:block;animation:obNext .36s cubic-bezier(.2,.8,.2,1) both;}
+.ob.is-rewinding .ob-pane.is-active{animation-name:obPrev;}
+@keyframes obNext{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:none;}}
+@keyframes obPrev{from{opacity:0;transform:translateX(-16px);}to{opacity:1;transform:none;}}
 
-.splash-visual{display:none;}
+.ob-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:var(--ob-ink);margin-bottom:10px;}
+.ob-mark{width:24px;height:24px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;color:#fff;
+  background:linear-gradient(135deg,var(--ob-accent),var(--ob-accent2));}
+.ob-mark svg{width:13px;height:13px;}
+.ob-field{position:relative;}
+.ob-input{width:100%;background:rgba(255,255,255,.045);border:1px solid var(--ob-line2);color:var(--ob-ink);
+  border-radius:14px;padding:15px 16px;font-size:16px;font-family:inherit;outline:none;
+  transition:border-color .18s,box-shadow .18s,background .18s;}
+.ob-input::placeholder{color:#5b648a;}
+.ob-input:focus{border-color:rgba(91,140,255,.75);background:rgba(91,140,255,.07);
+  box-shadow:0 0 0 4px rgba(91,140,255,.16);}
+.ob-input::-webkit-outer-spin-button,.ob-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.ob-input[type=number]{-moz-appearance:textfield;}
+.ob-input.has-prefix{padding-left:36px;}
+.ob-prefix{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none;
+  font-size:16px;font-weight:600;color:var(--ob-dim);transition:color .18s;}
+.ob-field:focus-within .ob-prefix{color:var(--ob-ink);}
+.ob-note{margin-top:9px;font-size:12px;line-height:1.5;color:var(--ob-dim2);}
+.ob-err{display:none;margin-top:9px;font-size:12.5px;color:var(--ob-down);align-items:center;gap:6px;}
+.ob-err svg{width:14px;height:14px;flex-shrink:0;}
+.ob-field.is-invalid .ob-input{border-color:rgba(255,107,114,.7);box-shadow:0 0 0 4px rgba(255,107,114,.13);}
+.ob-field.is-invalid ~ .ob-err{display:flex;}
+.ob-field.is-invalid ~ .ob-note{display:none;}
+.ob-shake{animation:obShake .32s cubic-bezier(.36,.07,.19,.97);}
+@keyframes obShake{25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}}
+
+.ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
+.ob-chip{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ob-dim);cursor:pointer;
+  background:rgba(255,255,255,.05);border:1px solid var(--ob-line);border-radius:99px;padding:7px 13px;
+  transition:background .16s,color .16s,border-color .16s,transform .12s;}
+.ob-chip:hover{color:var(--ob-ink);background:rgba(91,140,255,.16);border-color:rgba(91,140,255,.4);}
+.ob-chip:active{transform:scale(.95);}
+.ob-chip.is-picked{color:#fff;background:rgba(91,140,255,.26);border-color:rgba(91,140,255,.6);}
+
+/* ---- Hint bubbles ---- */
+.ob-hint{position:relative;margin-left:auto;width:21px;height:21px;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;
+  color:var(--ob-dim);background:rgba(255,255,255,.05);border:1px solid var(--ob-line2);
+  transition:color .16s,background .16s,border-color .16s;}
+.ob-hint:hover,.ob-hint.is-open,.ob-hint:focus-visible{color:#fff;background:rgba(91,140,255,.3);border-color:rgba(91,140,255,.6);}
+.ob-bubble{position:absolute;right:-2px;bottom:calc(100% + 11px);width:250px;padding:11px 13px;border-radius:14px;
+  background:#151d33;border:1px solid var(--ob-line2);box-shadow:0 22px 44px -18px rgba(0,0,0,.95);
+  font-size:12px;line-height:1.55;font-weight:400;color:var(--ob-dim);text-align:left;text-transform:none;
+  opacity:0;visibility:hidden;transform:translateY(6px) scale(.97);transform-origin:bottom right;
+  transition:opacity .18s,transform .18s,visibility .18s;pointer-events:none;z-index:6;}
+.ob-hint:hover .ob-bubble,.ob-hint:focus-visible .ob-bubble,.ob-hint.is-open .ob-bubble{opacity:1;visibility:visible;transform:none;}
+.ob-bubble::after{content:"";position:absolute;right:8px;top:100%;border:6px solid transparent;border-top-color:#151d33;}
+.ob-bubble b{color:var(--ob-ink);font-weight:600;}
+
+.ob-safe{display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:12px 14px;border-radius:15px;
+  font-size:12px;line-height:1.55;color:#a9ecd0;
+  background:linear-gradient(120deg,rgba(47,211,154,.11),rgba(91,140,255,.07));
+  border:1px solid rgba(47,211,154,.22);}
+.ob-safe svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--ob-up);}
+.ob-safe .ob-hint{margin-left:0;align-self:center;}
+
+.ob-review{display:flex;flex-direction:column;gap:10px;}
+.ob-row{display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:16px;
+  background:rgba(255,255,255,.04);border:1px solid var(--ob-line);}
+.ob-row .ob-mark{width:30px;height:30px;border-radius:11px;}
+.ob-row .ob-mark svg{width:15px;height:15px;}
+.ob-row-k{font-size:11.5px;color:var(--ob-dim2);}
+.ob-row-v{font-size:15.5px;font-weight:600;margin-top:2px;word-break:break-word;}
+.ob-edit{margin-left:auto;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ob-accent);
+  background:none;border:none;cursor:pointer;padding:7px 9px;border-radius:9px;transition:background .16s;}
+.ob-edit:hover{background:rgba(91,140,255,.15);}
+
+.ob-actions{display:flex;gap:10px;margin-top:26px;}
+.ob-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:15px;
+  padding:15px 20px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;border:none;
+  transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .22s,background .2s,color .2s;}
+.ob-btn svg{width:17px;height:17px;}
+.ob-back{flex:0 0 auto;color:var(--ob-dim);background:rgba(255,255,255,.05);border:1px solid var(--ob-line2);}
+.ob-back:hover{color:var(--ob-ink);background:rgba(255,255,255,.1);}
+.ob-back:active{transform:scale(.97);}
+.ob-cta{flex:1;position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(135deg,#4f7dff 0%,#7b5cff 52%,#a074ff 100%);background-size:190% 190%;
+  box-shadow:0 14px 32px -14px rgba(91,140,255,.9), inset 0 1px 0 rgba(255,255,255,.22);}
+.ob-cta::after{content:"";position:absolute;top:0;left:-75%;width:45%;height:100%;transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);transition:left .6s ease;}
+.ob-cta:hover{transform:translateY(-2px);background-position:100% 50%;
+  box-shadow:0 22px 44px -14px rgba(123,92,255,.95), inset 0 1px 0 rgba(255,255,255,.3);}
+.ob-cta:hover::after{left:135%;}
+.ob-cta:active{transform:translateY(0) scale(.985);}
+.ob-cta:disabled{cursor:progress;filter:saturate(.7);transform:none;}
+.ob-cta:disabled::after{display:none;}
+.ob-spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;animation:obSpin .7s linear infinite;}
+@keyframes obSpin{to{transform:rotate(360deg);}}
+.ob .ob-btn:focus-visible,.ob .ob-chip:focus-visible,.ob .ob-hint:focus-visible,.ob .ob-edit:focus-visible,
+.ob .ob-link:focus-visible{outline:2px solid #8fb3ff;outline-offset:2px;}
+
+.ob-foot{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+  margin-top:22px;padding-top:18px;border-top:1px solid var(--ob-line);font-size:12px;color:var(--ob-dim2);}
+.ob-foot a{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ob-dim);transition:color .16s;}
+.ob-foot a:hover{color:var(--ob-accent);}
+.ob-foot svg{width:14px;height:14px;}
+
+/* ---- Left column: live preview of the journal being created ---- */
+.ob-aside{display:none;}
+.ob-badge{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;
+  color:#cbd8ff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+  padding:7px 13px;border-radius:99px;}
+.ob-badge svg{width:14px;height:14px;}
+.ob-brand{display:flex;align-items:center;gap:13px;}
+.ob-brand-logo{width:52px;height:52px;border-radius:17px;background:#fff;display:grid;place-items:center;
+  overflow:hidden;flex-shrink:0;box-shadow:0 14px 30px -14px rgba(0,0,0,.9);}
+.ob-brand-logo img{width:33px;height:33px;object-fit:contain;border-radius:10px;}
+.ob-brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:#fff;letter-spacing:-.2px;}
+.ob-brand-sub{font-size:12.5px;line-height:1.5;color:rgba(238,241,251,.6);margin-top:3px;max-width:30ch;}
+
+.ob-card{position:relative;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  box-shadow:0 32px 64px -34px rgba(0,0,0,.95);}
+.ob-card-head{display:flex;align-items:center;gap:10px;}
+.ob-avatar{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;
+  font-weight:700;font-size:14px;color:#fff;background:linear-gradient(135deg,var(--ob-accent),var(--ob-accent2));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);}
+.ob-who{font-size:13.5px;font-weight:600;color:#fff;}
+.ob-who-sub{font-size:11px;color:rgba(238,241,251,.5);margin-top:1px;}
+.ob-live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#8ff0bb;}
+.ob-live i{width:6px;height:6px;border-radius:50%;background:var(--ob-up);animation:obPulse 2s ease-out infinite;}
+@keyframes obPulse{0%{box-shadow:0 0 0 0 rgba(47,211,154,.55);}70%{box-shadow:0 0 0 7px rgba(47,211,154,0);}100%{box-shadow:0 0 0 0 rgba(47,211,154,0);}}
+.ob-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.ob-stat{border-radius:14px;padding:10px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);}
+.ob-stat-k{font-size:10.5px;color:rgba(238,241,251,.48);}
+.ob-stat-v{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;
+  margin-top:4px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ob-stat-v.is-bumping{animation:obBump .45s cubic-bezier(.2,.8,.2,1);}
+@keyframes obBump{0%{transform:scale(1);}40%{transform:scale(1.07);color:#a8c4ff;}100%{transform:scale(1);}}
+.ob-chart{position:relative;}
+.ob-chart svg{display:block;width:100%;height:auto;overflow:visible;}
+.ob-chart-tag{position:absolute;top:-2px;right:0;font-size:11px;font-weight:600;color:#8ff0bb;
+  background:rgba(47,211,154,.16);border:1px solid rgba(47,211,154,.32);padding:3px 9px;border-radius:99px;}
+.ob-curve{stroke-dasharray:620;stroke-dashoffset:620;animation:obDraw 1.9s cubic-bezier(.35,0,.15,1) .3s forwards;}
+@keyframes obDraw{to{stroke-dashoffset:0;}}
+.ob-base{font-size:10px;fill:rgba(238,241,251,.45);font-family:'Inter',sans-serif;}
+.ob-links{margin-top:auto;display:flex;flex-direction:column;gap:9px;}
+.ob-links-k{font-size:11.5px;color:rgba(238,241,251,.45);}
+.ob-links-row{display:flex;gap:9px;flex-wrap:wrap;}
+.ob-link{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#eef1fb;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:8px 13px;border-radius:12px;
+  transition:background .16s,border-color .16s;}
+.ob-link:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.28);}
+.ob-link svg{width:15px;height:15px;}
+
 @media(min-width:900px){
-  .splash-mobile-header,.splash-mobile-contact{display:none;}
-  .splash-inner{flex-direction:row;align-items:stretch;gap:0;background:var(--card);
-    border:1px solid var(--card-border);border-radius:28px;overflow:hidden;
-    box-shadow:0 30px 70px -30px rgba(20,30,60,.35),0 2px 10px -2px rgba(20,30,60,.08);}
-
-  /* ---- Left: brand + candlestick chart art ---- */
-  .splash-visual{flex:1 1 46%;display:flex;flex-direction:column;justify-content:space-between;
-    gap:26px;padding:44px 40px;color:#f4f6fb;position:relative;overflow:hidden;
-    background:radial-gradient(600px 420px at 15% 0%, rgba(47,107,255,.55), transparent 60%),
-      radial-gradient(500px 420px at 100% 100%, rgba(139,92,246,.45), transparent 60%),
-      linear-gradient(165deg,#0c1024 0%,#161c38 55%,#211a3d 100%);}
-  .splash-badge{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
-    letter-spacing:.04em;text-transform:uppercase;color:#c9d4ff;background:rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.18);padding:6px 12px;border-radius:99px;backdrop-filter:blur(6px);}
-  .splash-badge svg{width:13px;height:13px;}
-  .splash-brand-lockup{display:flex;align-items:center;gap:13px;position:relative;}
-  .splash-brand-lockup .splash-logo-wrap{width:52px;height:52px;box-shadow:none;border-color:rgba(255,255,255,.2);}
-  .splash-brand-lockup .splash-logo{width:32px;height:32px;}
-  .splash-brand-lockup .brandmark{color:#ffffff;font-size:20px;}
-  .splash-brand-lockup .brand-sub{color:rgba(244,246,251,.68);font-size:12.5px;max-width:300px;}
-
-  .splash-chart-wrap{position:relative;flex:1;display:flex;align-items:center;min-height:150px;}
-  .splash-chart{width:100%;height:auto;overflow:visible;}
-  .splash-chart-pill{position:absolute;top:2px;right:0;font-size:11px;font-weight:700;color:#8ff0bb;
-    background:rgba(18,183,106,.18);border:1px solid rgba(95,227,161,.35);padding:4px 10px;border-radius:99px;}
-
-  .splash-contact{display:flex;flex-direction:column;gap:10px;position:relative;}
-  .splash-contact-label{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:rgba(244,246,251,.5);}
-  .splash-contact-links{display:flex;gap:10px;flex-wrap:wrap;}
-  .splash-contact-link{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
-    color:#f4f6fb;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
-    padding:8px 13px;border-radius:12px;transition:.15s;}
-  .splash-contact-link:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);}
-  .splash-contact-link svg{width:15px;height:15px;flex-shrink:0;}
-
-  /* ---- Right: onboarding form ---- */
-  .splash-form-col{flex:1 1 54%;display:flex;flex-direction:column;justify-content:center;
-    padding:48px 48px;gap:0;}
-  .splash-form-head{display:block;margin-bottom:24px;}
-  .sfh-eyebrow{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--blue2);}
-  .sfh-title{font-family:'Space Grotesk';font-weight:700;font-size:25px;color:var(--text);margin-top:6px;letter-spacing:-.2px;}
-  .sfh-sub{font-size:13.5px;color:var(--text-dim);margin-top:7px;line-height:1.5;max-width:360px;}
-  .splash-form-col .onboard-card{max-width:400px;margin:0;box-shadow:none;border:none;padding:0;background:transparent;}
-  .splash-form-col .onboard-card::before{display:none;}
-  .splash-form-col .field-label:first-child{margin-top:0;}
-  .splash-form-col .input{padding:14px 15px;font-size:15.5px;}
-  .splash-form-col #ob-submit{padding:15px 18px;font-size:15.5px;}
+  .ob-shell{grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);}
+  .ob-hero{display:none;}
+  .ob-aside{display:flex;flex-direction:column;gap:22px;padding:38px 34px;position:relative;overflow:hidden;
+    border-right:1px solid var(--ob-line);
+    background:
+      radial-gradient(520px 380px at 8% -5%, rgba(91,140,255,.42), transparent 62%),
+      radial-gradient(460px 400px at 112% 110%, rgba(160,116,255,.38), transparent 60%),
+      linear-gradient(165deg,#0b0f20 0%,#141a33 56%,#1a1637 100%);}
+  .ob-aside::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(72% 62% at 50% 38%,#000,transparent 76%);
+    mask-image:radial-gradient(72% 62% at 50% 38%,#000,transparent 76%);}
+  .ob-aside > *{position:relative;}
+  .ob-main{padding:42px 44px;}
+  .ob-foot{display:none;}
 }
+@media(max-width:899px){
+  .ob-shell{border-radius:22px;}
+  .ob-bubble{width:min(250px,72vw);}
+}
+
+/* ---- Intro page shown to first-time visitors before setup ---- */
+.ob.is-landing{display:block;padding:0;}
+.ob [hidden]{display:none !important;}
+.lp{max-width:1080px;margin:0 auto;
+  padding:clamp(16px,3.4vw,28px) clamp(16px,4vw,32px) calc(56px + env(safe-area-inset-bottom));}
+.lp-nav{display:flex;align-items:center;gap:12px;padding:8px 0 clamp(30px,6vw,52px);}
+.lp-logo{width:40px;height:40px;border-radius:13px;background:#fff;display:grid;place-items:center;
+  overflow:hidden;flex-shrink:0;box-shadow:0 10px 24px -14px rgba(0,0,0,.9);}
+.lp-logo img{width:26px;height:26px;object-fit:contain;border-radius:8px;}
+.lp-nav-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.1px;}
+.lp-nav-sub{font-size:11.5px;color:var(--ob-dim2);margin-top:1px;}
+.lp-mini{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13.5px;
+  font-weight:600;color:var(--ob-ink);cursor:pointer;padding:10px 16px;border-radius:12px;
+  background:rgba(255,255,255,.06);border:1px solid var(--ob-line2);
+  transition:background .16s,border-color .16s,transform .14s;}
+.lp-mini:hover{background:rgba(91,140,255,.2);border-color:rgba(91,140,255,.55);}
+.lp-mini:active{transform:scale(.97);}
+
+.lp-hero{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,44px);align-items:center;}
+.lp-h1{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-1.2px;line-height:1.08;
+  font-size:clamp(31px,6.4vw,48px);margin:16px 0 0;}
+.lp-lede{font-size:15.5px;line-height:1.65;color:var(--ob-dim);max-width:50ch;margin-top:15px;}
+.lp-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:28px;}
+.lp-actions .ob-cta{flex:0 0 auto;padding:16px 30px;font-size:16px;}
+.lp-assure{font-size:12.5px;line-height:1.5;color:var(--ob-dim2);}
+
+.lp-section{margin-top:clamp(48px,8vw,84px);}
+.lp-h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(20px,3.4vw,26px);
+  letter-spacing:-.4px;}
+.lp-sub{font-size:14px;line-height:1.6;color:var(--ob-dim);margin-top:8px;max-width:56ch;}
+.lp-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:24px;}
+.lp-card{padding:18px 19px;border-radius:18px;border:1px solid var(--ob-line);
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+  transition:border-color .18s,background .18s;}
+.lp-card:hover{border-color:var(--ob-line2);background:linear-gradient(180deg,rgba(91,140,255,.1),rgba(255,255,255,.02));}
+.lp-card .ob-mark{width:32px;height:32px;border-radius:11px;}
+.lp-card .ob-mark svg{width:16px;height:16px;}
+.lp-card-t{font-size:15px;font-weight:600;margin-top:13px;}
+.lp-card-d{font-size:13px;line-height:1.6;color:var(--ob-dim);margin-top:6px;}
+.lp-card.is-soon .lp-card-t::after{content:"Soon";margin-left:8px;font-size:10px;font-weight:700;
+  color:#cbd8ff;background:rgba(91,140,255,.2);border:1px solid rgba(91,140,255,.35);
+  padding:2px 7px;border-radius:99px;vertical-align:middle;}
+
+.lp-flow{display:grid;grid-template-columns:1fr;gap:12px;margin-top:24px;counter-reset:lpstep;}
+.lp-stepbox{display:flex;gap:14px;padding:17px 18px;border-radius:18px;border:1px solid var(--ob-line);
+  background:rgba(255,255,255,.035);}
+.lp-stepbox::before{counter-increment:lpstep;content:counter(lpstep);flex-shrink:0;
+  width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg,var(--ob-accent),var(--ob-accent2));}
+.lp-step-t{font-size:14.5px;font-weight:600;}
+.lp-step-d{font-size:13px;line-height:1.6;color:var(--ob-dim);margin-top:5px;}
+
+.lp-close{margin-top:clamp(44px,7vw,72px);padding:clamp(26px,5vw,40px);border-radius:24px;text-align:center;
+  border:1px solid rgba(91,140,255,.25);
+  background:radial-gradient(600px 260px at 50% -30%, rgba(91,140,255,.26), transparent 70%),
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));}
+.lp-close .ob-cta{flex:0 0 auto;margin-top:20px;padding:16px 32px;font-size:16px;}
+.lp-close .lp-assure{margin-top:14px;}
+.lp-foot{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  margin-top:34px;font-size:12.5px;color:var(--ob-dim2);}
+.lp-foot a{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ob-dim);transition:color .16s;}
+.lp-foot a:hover{color:var(--ob-accent);}
+.lp-foot svg{width:15px;height:15px;}
+
+.ob-return{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;
+  font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ob-dim2);cursor:pointer;
+  background:none;border:none;padding:6px 9px 6px 6px;border-radius:10px;transition:color .16s,background .16s;}
+.ob-return:hover{color:var(--ob-ink);background:rgba(255,255,255,.06);}
+.ob-return svg{width:15px;height:15px;}
+
+@media(min-width:760px){
+  .lp-grid{grid-template-columns:repeat(3,1fr);}
+  .lp-flow{grid-template-columns:repeat(3,1fr);}
+}
+@media(min-width:900px){
+  .lp-hero{grid-template-columns:1.04fr .96fr;}
+  .lp-hero .ob-card{padding:19px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .ob-shell,.ob-pane.is-active{animation:none;}
+  .ob-curve{animation:none;stroke-dashoffset:0;}
+  .ob-live i,.ob-stat-v.is-bumping{animation:none;}
+  .ob-cta:hover{transform:none;}
+  .ob-cta::after{display:none;}
+}
+
 .input, select.input, textarea.input{
   width:100%;background:var(--card-hi);border:1px solid var(--border);color:var(--text);
   border-radius:12px;padding:13px 14px;font-size:15px;outline:none;transition:border-color .15s, box-shadow .15s;
@@ -1564,7 +1809,11 @@ async function boot(){
 }
 function render(){
   const app = $('#app');
-  if(!S.profile){ app.innerHTML = renderOnboarding(); bindOnboarding(); return; }
+  if(!S.profile){
+    document.body.classList.add('onboarding');
+    app.innerHTML = renderOnboarding(); bindOnboarding(); return;
+  }
+  document.body.classList.remove('onboarding');
   app.innerHTML = renderShell();
   bindShell();
   renderRoute();
@@ -1583,105 +1832,495 @@ if(window.visualViewport){
   updateKbOffset();
 }
 
-/* ---------------- Onboarding ---------------- */
+/* ---------------- Onboarding ---------------- *
+   Three-step guided setup. The left panel is a live preview of the journal
+   being created (name + starting balance feed it as you type); the right
+   panel is the form. Below 900px the preview collapses into a hero strip
+   and the form becomes a single column. */
+const OB = { step:1, name:'', balance:'', saving:false };
+const OB_STEPS = 3;
+
+function obMoney(n){
+  if(!isFinite(n)) return '—';
+  return '$' + Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+}
+
 function renderOnboarding(){
+  OB.step = 1; OB.name = ''; OB.balance = ''; OB.saving = false;
   return `
-  <div class="splash">
-    <div class="splash-inner">
+  <div class="ob is-landing" id="ob">
+    <div class="lp" id="ob-landing">
+      <nav class="lp-nav">
+        <div class="lp-logo"><img src="${LOGO_SRC}" alt=""></div>
+        <div>
+          <div class="lp-nav-name">Trading Journal</div>
+          <div class="lp-nav-sub">Local-first, private</div>
+        </div>
+        <button type="button" class="lp-mini" data-start>Get started</button>
+      </nav>
 
-      <div class="splash-visual">
-        <span class="splash-badge">${svgIcon('layers')} Open Source Trading Journal</span>
-
-        <div class="splash-brand-lockup">
-          <div class="splash-logo-wrap"><img src="${LOGO_SRC}" class="splash-logo" alt="Trading Journal"></div>
-          <div>
-            <div class="brandmark">Trading Journal</div>
-            <div class="brand-sub">Log trades, track performance, and see your edge clearly — all stored on this device.</div>
+      <header class="lp-hero">
+        <div>
+          <span class="ob-badge">${svgIcon('layers')} Open source, runs in your browser</span>
+          <h1 class="lp-h1">Know why you win, not just how much.</h1>
+          <p class="lp-lede">A trading journal that logs every entry, exit and lesson, then turns them into
+            an equity curve, a win rate and a read on the sessions and setups that actually pay you.
+            No account, no server — your journal lives in this browser.</p>
+          <div class="lp-actions">
+            <button type="button" class="ob-btn ob-cta" data-start>${svgIcon('sparkle')}Get started</button>
+            <span class="lp-assure">Takes under a minute.<br>Name and starting balance, that's it.</span>
           </div>
         </div>
 
-        <div class="splash-chart-wrap">
-          <span class="splash-chart-pill">+12.4%</span>
-          <svg class="splash-chart" viewBox="0 0 320 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line x1="0" y1="150" x2="320" y2="150" stroke="rgba(255,255,255,.14)"/>
-            <line x1="0" y1="110" x2="320" y2="110" stroke="rgba(255,255,255,.09)"/>
-            <line x1="0" y1="70" x2="320" y2="70" stroke="rgba(255,255,255,.09)"/>
-            <line x1="0" y1="30" x2="320" y2="30" stroke="rgba(255,255,255,.09)"/>
-            <polyline points="24,120 58,107 92,93 126,102 160,77 194,85 228,57 262,65 296,37"
-              stroke="rgba(120,170,255,.55)" stroke-width="1.6" stroke-dasharray="4 4" fill="none"/>
-            <g stroke-width="2">
-              <line x1="24" y1="100" x2="24" y2="140" stroke="#ff8a8f"/><rect x="17" y="108" width="14" height="24" rx="2" fill="#ff8a8f"/>
-              <line x1="58" y1="90" x2="58" y2="125" stroke="#5fe3a1"/><rect x="51" y="96" width="14" height="22" rx="2" fill="#5fe3a1"/>
-              <line x1="92" y1="70" x2="92" y2="115" stroke="#5fe3a1"/><rect x="85" y="78" width="14" height="30" rx="2" fill="#5fe3a1"/>
-              <line x1="126" y1="85" x2="126" y2="120" stroke="#ff8a8f"/><rect x="119" y="92" width="14" height="20" rx="2" fill="#ff8a8f"/>
-              <line x1="160" y1="55" x2="160" y2="100" stroke="#5fe3a1"/><rect x="153" y="62" width="14" height="30" rx="2" fill="#5fe3a1"/>
-              <line x1="194" y1="65" x2="194" y2="105" stroke="#ff8a8f"/><rect x="187" y="72" width="14" height="26" rx="2" fill="#ff8a8f"/>
-              <line x1="228" y1="35" x2="228" y2="80" stroke="#5fe3a1"/><rect x="221" y="42" width="14" height="30" rx="2" fill="#5fe3a1"/>
-              <line x1="262" y1="45" x2="262" y2="85" stroke="#ff8a8f"/><rect x="255" y="52" width="14" height="26" rx="2" fill="#ff8a8f"/>
-              <line x1="296" y1="15" x2="296" y2="60" stroke="#5fe3a1"/><rect x="289" y="22" width="14" height="30" rx="2" fill="#5fe3a1"/>
-            </g>
-          </svg>
-        </div>
-
-        <div class="splash-contact">
-          <div class="splash-contact-label">Contact us</div>
-          <div class="splash-contact-links">
-            <a class="splash-contact-link" href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">${svgIcon('instagram')}@kexer.vx</a>
-            <a class="splash-contact-link" href="https://github.com/karim2762" target="_blank" rel="noopener">${svgIcon('github')}karim2762</a>
+        <div class="ob-card" aria-hidden="true">
+          <div class="ob-card-head">
+            <div class="ob-avatar">A</div>
+            <div>
+              <div class="ob-who">Alex's journal</div>
+              <div class="ob-who-sub">Sample dashboard</div>
+            </div>
+            <span class="ob-live"><i></i>Live</span>
+          </div>
+          <div class="ob-stats">
+            <div class="ob-stat"><div class="ob-stat-k">Balance</div><div class="ob-stat-v">$11,240</div></div>
+            <div class="ob-stat"><div class="ob-stat-k">Trades</div><div class="ob-stat-v">38</div></div>
+            <div class="ob-stat"><div class="ob-stat-k">Win rate</div><div class="ob-stat-v">61%</div></div>
+          </div>
+          <div class="ob-chart">
+            <span class="ob-chart-tag">+12.4%</span>
+            <svg viewBox="0 0 320 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="lpFade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#5b8cff" stop-opacity=".38"/>
+                  <stop offset="100%" stop-color="#5b8cff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 92 L40 84 L80 88 L120 68 L160 74 L200 52 L240 57 L280 34 L320 22 L320 104 L0 104 Z" fill="url(#lpFade)"/>
+              <line x1="0" y1="92" x2="320" y2="92" stroke="rgba(255,255,255,.18)" stroke-dasharray="3 5"/>
+              <polyline class="ob-curve" points="0,92 40,84 80,88 120,68 160,74 200,52 240,57 280,34 320,22"
+                stroke="#8fb3ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="320" cy="22" r="4" fill="#8ff0bb"/>
+              <text class="ob-base" x="0" y="118">Started at $10,000</text>
+            </svg>
           </div>
         </div>
+      </header>
+
+      <section class="lp-section">
+        <h2 class="lp-h2">What's inside</h2>
+        <p class="lp-sub">Everything a prop-firm dashboard gives you, without handing your trade history to anyone.</p>
+        <div class="lp-grid">
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('image')}</span>
+            <div class="lp-card-t">Log a trade from a screenshot</div>
+            <p class="lp-card-d">Drop in your chart and the entry, exit, stop, target and P&amp;L come back filled in.
+              Check the numbers, adjust anything, save. Manual entry works the same way.</p>
+          </div>
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('dashboard')}</span>
+            <div class="lp-card-t">A dashboard you can read at a glance</div>
+            <p class="lp-card-d">Balance, net P&amp;L, win rate, average R:R and max drawdown, with your equity
+              curve and recent trades on the same screen.</p>
+          </div>
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('chart')}</span>
+            <div class="lp-card-t">Analysis by session and strategy</div>
+            <p class="lp-card-d">Break results down by London, New York or Asia and by the setups you tag,
+              so the edge you think you have gets checked against the record.</p>
+          </div>
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('pencil')}</span>
+            <div class="lp-card-t">Notes on the part that isn't numbers</div>
+            <p class="lp-card-d">Record your mindset, what you saw and what you'd do differently. The trades
+              you regret are usually the ones worth re-reading.</p>
+          </div>
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('sync')}</span>
+            <div class="lp-card-t">Backups and device transfers</div>
+            <p class="lp-card-d">Export a JSON backup or generate a transfer code to move the whole journal
+              to another browser or device.</p>
+          </div>
+          <div class="lp-card">
+            <span class="ob-mark">${svgIcon('shield')}</span>
+            <div class="lp-card-t">Private by construction</div>
+            <p class="lp-card-d">Trades are written to this browser's own database. There's no sign-up,
+              no sync and nothing to leak, because nothing leaves the device.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <h2 class="lp-h2">How it works</h2>
+        <div class="lp-flow">
+          <div class="lp-stepbox">
+            <div>
+              <div class="lp-step-t">Set up your journal</div>
+              <p class="lp-step-d">Your name and your starting balance. Everything is measured from that figure.</p>
+            </div>
+          </div>
+          <div class="lp-stepbox">
+            <div>
+              <div class="lp-step-t">Log trades as you take them</div>
+              <p class="lp-step-d">Screenshot or manual, plus tags for the session, the setup and how it felt.</p>
+            </div>
+          </div>
+          <div class="lp-stepbox">
+            <div>
+              <div class="lp-step-t">Review what the record says</div>
+              <p class="lp-step-d">Watch the equity curve, and cut the setups and hours that keep costing you.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-close">
+        <h2 class="lp-h2">Ready to start the record?</h2>
+        <p class="lp-sub" style="margin-left:auto;margin-right:auto;">Set up takes two answers, and your first
+          trade can go in straight after.</p>
+        <button type="button" class="ob-btn ob-cta" data-start>${svgIcon('sparkle')}Get started</button>
+        <p class="lp-assure">Stored in this browser only. No account, no upload.</p>
+      </section>
+
+      <footer class="lp-foot">
+        <span>Built by Kexer</span>
+        <a href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">${svgIcon('instagram')}@kexer.vx</a>
+        <a href="https://github.com/karim2762" target="_blank" rel="noopener">${svgIcon('github')}karim2762</a>
+      </footer>
+    </div>
+
+    <div class="ob-shell" id="ob-setup" hidden>
+
+      <div class="ob-hero">
+        <div class="ob-hero-logo"><img src="${LOGO_SRC}" alt=""></div>
+        <div>
+          <div class="ob-hero-name">Trading Journal</div>
+          <div class="ob-hero-sub">Private by default, stored on this device</div>
+        </div>
+        <svg class="ob-hero-art" viewBox="0 0 160 60" fill="none" aria-hidden="true">
+          <path d="M0 48 L26 40 L52 44 L78 28 L104 33 L130 16 L160 8" stroke="#8ff0bb" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
 
-      <div class="splash-form-col">
-        <div class="splash-mobile-header">
-          <div class="splash-logo-wrap"><img src="${LOGO_SRC}" class="splash-logo" alt="Trading Journal"></div>
+      <aside class="ob-aside">
+        <span class="ob-badge">${svgIcon('layers')} Open source, runs in your browser</span>
+
+        <div class="ob-brand">
+          <div class="ob-brand-logo"><img src="${LOGO_SRC}" alt="Trading Journal"></div>
           <div>
-            <div class="brandmark">Trading Journal</div>
-            <div class="brand-sub">Your private trading journal. Log trades, track performance, and see your edge clearly — all stored on this device.</div>
+            <div class="ob-brand-name">Trading Journal</div>
+            <div class="ob-brand-sub">Log trades, track performance, and see your edge clearly.</div>
           </div>
         </div>
 
-        <div class="splash-form-head">
-          <div class="sfh-eyebrow">Get started</div>
-          <div class="sfh-title">Set up your journal</div>
-          <div class="sfh-sub">Takes less than a minute. Everything you enter stays on this device.</div>
-        </div>
+        <div class="ob-card" aria-hidden="true">
+          <div class="ob-card-head">
+            <div class="ob-avatar" id="ob-avatar">?</div>
+            <div>
+              <div class="ob-who" id="ob-who">Your journal</div>
+              <div class="ob-who-sub">Dashboard preview</div>
+            </div>
+            <span class="ob-live"><i></i>Live</span>
+          </div>
 
-        <div class="onboard-card">
-          <div class="field-label-row"><span class="fli fli-user">${svgIcon('user')}</span><span>Your name</span></div>
-          <input class="input" id="ob-name" placeholder="e.g. Alex Morgan" maxlength="40">
+          <div class="ob-stats">
+            <div class="ob-stat">
+              <div class="ob-stat-k">Balance</div>
+              <div class="ob-stat-v" id="ob-pv-balance">—</div>
+            </div>
+            <div class="ob-stat">
+              <div class="ob-stat-k">Trades</div>
+              <div class="ob-stat-v">0</div>
+            </div>
+            <div class="ob-stat">
+              <div class="ob-stat-k">Win rate</div>
+              <div class="ob-stat-v">—</div>
+            </div>
+          </div>
 
-          <div class="field-label-row"><span class="fli fli-pnl">${svgIcon('dollar')}</span><span>Starting account balance</span></div>
-          <input class="input" id="ob-balance" type="number" inputmode="decimal" placeholder="e.g. 10000" min="0" step="0.01">
-
-          <button class="btn btn-primary btn-block" id="ob-submit">${svgIcon('plus')}Create my journal</button>
-
-          <div class="onboard-privacy">${svgIcon('shield')}<span>Everything is stored locally in this browser (IndexedDB). Nothing is uploaded.</span></div>
-        </div>
-
-        <div class="splash-mobile-contact" style="margin-top:18px;">
-          <div>Open source trading journal</div>
-          <div class="smc-links">
-            <a href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">${svgIcon('instagram')}@kexer.vx</a>
-            <a href="https://github.com/karim2762" target="_blank" rel="noopener">${svgIcon('github')}karim2762</a>
+          <div class="ob-chart">
+            <span class="ob-chart-tag">Sample equity</span>
+            <svg viewBox="0 0 320 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="obFade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#5b8cff" stop-opacity=".38"/>
+                  <stop offset="100%" stop-color="#5b8cff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0 92 L40 84 L80 88 L120 68 L160 74 L200 52 L240 57 L280 34 L320 22 L320 104 L0 104 Z" fill="url(#obFade)"/>
+              <line x1="0" y1="92" x2="320" y2="92" stroke="rgba(255,255,255,.18)" stroke-dasharray="3 5"/>
+              <polyline class="ob-curve" points="0,92 40,84 80,88 120,68 160,74 200,52 240,57 280,34 320,22"
+                stroke="#8fb3ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <circle cx="320" cy="22" r="4" fill="#8ff0bb"/>
+              <text class="ob-base" x="0" y="118" id="ob-base-label">Starts at your opening balance</text>
+            </svg>
           </div>
         </div>
-      </div>
+
+        <div class="ob-links">
+          <div class="ob-links-k">Built by Kexer</div>
+          <div class="ob-links-row">
+            <a class="ob-link" href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">${svgIcon('instagram')}@kexer.vx</a>
+            <a class="ob-link" href="https://github.com/karim2762" target="_blank" rel="noopener">${svgIcon('github')}karim2762</a>
+          </div>
+        </div>
+      </aside>
+
+      <section class="ob-main">
+        <button type="button" class="ob-return" data-overview>${svgIcon('back')}Back to overview</button>
+        <div class="ob-kicker">Get started</div>
+        <h1 class="ob-title">Set up your journal</h1>
+        <p class="ob-lede">Two details and you're in. Everything you log stays on this device.</p>
+
+        <div class="ob-progress">
+          <div class="ob-track"><div class="ob-fill" id="ob-fill"></div></div>
+          <div class="ob-crumbs" id="ob-crumbs">
+            <span class="ob-crumb is-active" data-step="1"><span class="ob-num">1</span>Name</span>
+            <span class="ob-crumb" data-step="2"><span class="ob-num">2</span>Balance</span>
+            <span class="ob-crumb" data-step="3"><span class="ob-num">3</span>Review</span>
+          </div>
+        </div>
+
+        <div class="ob-panes">
+
+          <div class="ob-pane is-active" data-pane="1">
+            <label class="ob-label" for="ob-name">
+              <span class="ob-mark">${svgIcon('user')}</span>What should we call you?
+              <button type="button" class="ob-hint" aria-label="Why we ask for your name">?
+                <span class="ob-bubble"><b>Only used for greetings.</b> Your name labels the dashboard and exported backups. It never leaves this browser.</span>
+              </button>
+            </label>
+            <div class="ob-field"><input class="ob-input" id="ob-name" placeholder="Alex Morgan" maxlength="40" autocomplete="name"></div>
+            <div class="ob-err"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Add a name to label your journal.</div>
+            <p class="ob-note">A first name is enough.</p>
+          </div>
+
+          <div class="ob-pane" data-pane="2">
+            <label class="ob-label" for="ob-balance">
+              <span class="ob-mark">${svgIcon('dollar')}</span>Starting account balance
+              <button type="button" class="ob-hint" aria-label="Why the starting balance matters">?
+                <span class="ob-bubble"><b>It's the baseline for every number.</b> Return %, drawdown, risk per trade and the equity curve are all measured from this figure.</span>
+              </button>
+            </label>
+            <div class="ob-field">
+              <span class="ob-prefix">$</span>
+              <input class="ob-input has-prefix" id="ob-balance" type="number" inputmode="decimal" placeholder="10000" min="0" step="0.01">
+            </div>
+            <div class="ob-err"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Enter an amount greater than zero.</div>
+            <div class="ob-chips" id="ob-chips">
+              <button type="button" class="ob-chip" data-amount="1000">$1,000</button>
+              <button type="button" class="ob-chip" data-amount="5000">$5,000</button>
+              <button type="button" class="ob-chip" data-amount="10000">$10,000</button>
+              <button type="button" class="ob-chip" data-amount="25000">$25,000</button>
+              <button type="button" class="ob-chip" data-amount="100000">$100,000</button>
+            </div>
+            <p class="ob-note">Change it any time in Settings.</p>
+          </div>
+
+          <div class="ob-pane" data-pane="3">
+            <div class="ob-review">
+              <div class="ob-row">
+                <span class="ob-mark">${svgIcon('user')}</span>
+                <div>
+                  <div class="ob-row-k">Trader</div>
+                  <div class="ob-row-v" id="ob-rv-name">—</div>
+                </div>
+                <button type="button" class="ob-edit" data-goto="1">Edit</button>
+              </div>
+              <div class="ob-row">
+                <span class="ob-mark">${svgIcon('dollar')}</span>
+                <div>
+                  <div class="ob-row-k">Starting balance</div>
+                  <div class="ob-row-v" id="ob-rv-balance">—</div>
+                </div>
+                <button type="button" class="ob-edit" data-goto="2">Edit</button>
+              </div>
+            </div>
+            <p class="ob-note">Your first trade can go in straight after this.</p>
+          </div>
+
+        </div>
+
+        <div class="ob-safe">
+          ${svgIcon('shield')}
+          <span>Saved to this browser only (IndexedDB). No account, no upload.</span>
+          <button type="button" class="ob-hint" aria-label="What local storage means here">?
+            <span class="ob-bubble"><b>Nothing is sent anywhere.</b> Trades live in this browser's own database, so clearing site data removes them. Back up any time from Settings.</span>
+          </button>
+        </div>
+
+        <div class="ob-actions">
+          <button type="button" class="ob-btn ob-back" id="ob-back" style="display:none;">${svgIcon('back')}Back</button>
+          <button type="button" class="ob-btn ob-cta" id="ob-next">Continue</button>
+        </div>
+
+        <div class="ob-foot">
+          <span>Built by Kexer</span>
+          <a href="https://instagram.com/kexer.vx" target="_blank" rel="noopener">${svgIcon('instagram')}@kexer.vx</a>
+          <a href="https://github.com/karim2762" target="_blank" rel="noopener">${svgIcon('github')}karim2762</a>
+        </div>
+      </section>
 
     </div>
   </div>`;
 }
+
 function bindOnboarding(){
-  $('#ob-submit').addEventListener('click', async ()=>{
-    const name = $('#ob-name').value.trim();
-    const bal = parseFloat($('#ob-balance').value);
-    if(!name){ toast('Enter your name'); $('#ob-name').focus(); return; }
-    if(isNaN(bal) || bal<0){ toast('Enter a starting balance'); $('#ob-balance').focus(); return; }
-    S.profile = { id:1, name, startingBalance:bal, createdAt: new Date().toISOString() };
-    await dbPut('profile', S.profile);
+  const root    = $('#ob');
+  const landing = $('#ob-landing');
+  const setup   = $('#ob-setup');
+  const nameIn  = $('#ob-name');
+  const balIn   = $('#ob-balance');
+  const nextBtn = $('#ob-next');
+  const backBtn = $('#ob-back');
+  const fill    = $('#ob-fill');
+
+  /* --- live preview --- */
+  function syncPreview(){
+    const nm  = nameIn.value.trim();
+    const bal = parseFloat(balIn.value);
+    $('#ob-avatar').textContent = nm ? nm.charAt(0).toUpperCase() : '?';
+    $('#ob-who').textContent    = nm ? `${nm.split(' ')[0]}'s journal` : 'Your journal';
+    const pv = $('#ob-pv-balance');
+    const next = (isFinite(bal) && bal > 0) ? obMoney(bal) : '—';
+    if(pv.textContent !== next){
+      pv.textContent = next;
+      pv.classList.remove('is-bumping'); void pv.offsetWidth; pv.classList.add('is-bumping');
+    }
+    $('#ob-base-label').textContent = (isFinite(bal) && bal > 0)
+      ? `Starts at ${obMoney(bal)}` : 'Starts at your opening balance';
+    $('#ob-rv-name').textContent    = nm || '—';
+    $('#ob-rv-balance').textContent = (isFinite(bal) && bal > 0) ? obMoney(bal) : '—';
+  }
+
+  /* --- validation --- */
+  function invalidate(input){
+    const field = input.closest('.ob-field');
+    field.classList.add('is-invalid');
+    field.classList.remove('ob-shake'); void field.offsetWidth; field.classList.add('ob-shake');
+    input.focus();
+  }
+  function clearInvalid(input){ input.closest('.ob-field').classList.remove('is-invalid'); }
+
+  function validStep(step){
+    if(step === 1 && !nameIn.value.trim()){ invalidate(nameIn); return false; }
+    if(step === 2){
+      const bal = parseFloat(balIn.value);
+      if(!isFinite(bal) || bal <= 0){ invalidate(balIn); return false; }
+    }
+    return true;
+  }
+
+  /* --- step machine --- */
+  function goTo(step, rewinding){
+    OB.step = Math.min(OB_STEPS, Math.max(1, step));
+    root.classList.toggle('is-rewinding', !!rewinding);
+    root.querySelectorAll('.ob-pane').forEach(p=>{
+      p.classList.toggle('is-active', +p.dataset.pane === OB.step);
+    });
+    root.querySelectorAll('.ob-crumb').forEach(c=>{
+      const s = +c.dataset.step;
+      c.classList.toggle('is-active', s === OB.step);
+      c.classList.toggle('is-done', s < OB.step);
+      const num = c.querySelector('.ob-num');
+      num.innerHTML = s < OB.step ? svgIcon('check') : String(s);
+    });
+    fill.style.width = (OB.step / OB_STEPS * 100) + '%';
+    backBtn.style.display = OB.step === 1 ? 'none' : '';
+    nextBtn.innerHTML = OB.step === OB_STEPS
+      ? `${svgIcon('sparkle')}Create my journal`
+      : 'Continue';
+    const focusable = OB.step === 1 ? nameIn : (OB.step === 2 ? balIn : null);
+    if(focusable && matchMedia('(min-width:900px)').matches) focusable.focus();
+    syncPreview();
+  }
+
+  /* --- create --- */
+  async function create(){
+    if(OB.saving) return;
+    if(!validStep(1)){ goTo(1, true); return; }
+    if(!validStep(2)){ goTo(2, true); return; }
+    OB.saving = true;
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = `<span class="ob-spin"></span>Creating`;
+    const name = nameIn.value.trim();
+    const bal  = parseFloat(balIn.value);
+    S.profile = { id:1, name, startingBalance:bal, createdAt:new Date().toISOString() };
+    try{
+      await dbPut('profile', S.profile);
+    }catch(e){
+      OB.saving = false;
+      nextBtn.disabled = false;
+      nextBtn.innerHTML = `${svgIcon('sparkle')}Create my journal`;
+      toast("Couldn't save to this browser. Check storage permissions.");
+      return;
+    }
     toast(`Welcome, ${name.split(' ')[0]}`);
     render();
+  }
+
+  /* --- wiring --- */
+  nextBtn.addEventListener('click', ()=>{
+    if(OB.step === OB_STEPS) return create();
+    if(!validStep(OB.step)) return;
+    goTo(OB.step + 1, false);
   });
+  backBtn.addEventListener('click', ()=> goTo(OB.step - 1, true));
+
+  root.querySelectorAll('.ob-edit').forEach(b=>{
+    b.addEventListener('click', ()=> goTo(+b.dataset.goto, true));
+  });
+
+  [nameIn, balIn].forEach(input=>{
+    input.addEventListener('input', ()=>{ clearInvalid(input); syncPreview(); });
+    input.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){ e.preventDefault(); nextBtn.click(); }
+    });
+  });
+
+  $('#ob-chips').addEventListener('click', e=>{
+    const chip = e.target.closest('.ob-chip');
+    if(!chip) return;
+    balIn.value = chip.dataset.amount;
+    root.querySelectorAll('.ob-chip').forEach(c=>c.classList.toggle('is-picked', c === chip));
+    clearInvalid(balIn);
+    syncPreview();
+  });
+
+  /* hint bubbles: hover on pointer devices, tap to toggle on touch */
+  root.querySelectorAll('.ob-hint').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.preventDefault();
+      const open = btn.classList.contains('is-open');
+      root.querySelectorAll('.ob-hint').forEach(b=>b.classList.remove('is-open'));
+      btn.classList.toggle('is-open', !open);
+    });
+  });
+  root.addEventListener('click', e=>{
+    if(!e.target.closest('.ob-hint')) root.querySelectorAll('.ob-hint').forEach(b=>b.classList.remove('is-open'));
+  });
+  root.addEventListener('keydown', e=>{
+    if(e.key === 'Escape') root.querySelectorAll('.ob-hint').forEach(b=>b.classList.remove('is-open'));
+  });
+
+  /* --- intro page <-> setup --- */
+  function showSetup(){
+    landing.hidden = true;
+    setup.hidden = false;
+    root.classList.remove('is-landing');
+    window.scrollTo({top:0, behavior:'auto'});
+    goTo(1, false);
+  }
+  function showLanding(){
+    setup.hidden = true;
+    landing.hidden = false;
+    root.classList.add('is-landing');
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+  root.querySelectorAll('[data-start]').forEach(b=> b.addEventListener('click', showSetup));
+  root.querySelectorAll('[data-overview]').forEach(b=> b.addEventListener('click', showLanding));
+
+  goTo(1, false);
 }
 
 /* ---------------- Shell (header + nav) ---------------- */
